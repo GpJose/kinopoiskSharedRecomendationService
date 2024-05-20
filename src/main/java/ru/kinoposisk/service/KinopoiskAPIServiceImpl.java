@@ -10,6 +10,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.kinoposisk.config.RetryTemplateConfig;
 import ru.kinoposisk.dto.response.MovieResultResponseDTO;
@@ -48,7 +49,7 @@ public class KinopoiskAPIServiceImpl implements KinopoiskAPIService {
     public void sendRequest(Users user) {
 
 
-        List<MovieHistory> userMovieHistory = movieHistoryRepository.findByUser_Id(user.getId());
+        List<MovieHistory> userMovieHistory = movieHistoryRepository.findByUserId(user.getId());
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-API-KEY", apiKey);
@@ -63,13 +64,12 @@ public class KinopoiskAPIServiceImpl implements KinopoiskAPIService {
             ResponseEntity<MovieResultResponseDTO> responseEntity = templateConfig.restTemplate().exchange(URI.create(url), HttpMethod.GET, entity, MovieResultResponseDTO.class);
             log.info(responseEntity.getBody());
             MovieResultResponseDTO result = responseEntity.getBody();
-            log.info(result.getMovies().get(0));
             return ResponseEntity.ok(responseEntity.getBody());
         });
     }
 
     public Users findUserByLogin(String login) {
-        return userRepository.findByLogin(login);
+        return userRepository.findByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
 }

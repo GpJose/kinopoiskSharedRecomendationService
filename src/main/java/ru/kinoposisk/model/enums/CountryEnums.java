@@ -1,5 +1,9 @@
 package ru.kinoposisk.model.enums;
 
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
 public enum CountryEnums {
     Австралия,
     Австрия,
@@ -238,5 +242,10 @@ public enum CountryEnums {
     ЮАР,
     Югославия,
     Ямайка,
-    Япония
+    Япония;
+
+    @Override
+    public String toString() {
+        return this.name().replaceAll("_", " ");
+    }
 }

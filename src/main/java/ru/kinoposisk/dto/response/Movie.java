@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,15 +15,16 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+public
 class Movie {
     private Rating rating;
     @JsonProperty("movieLength")
     private int length;
-    private int id;
+    private Long id;
     private String type;
     private String name;
     private String description;
-    private int year;
+    private Integer year;
     private Poster poster;
     private List<Genre> genres;
     private List<Country> countries;

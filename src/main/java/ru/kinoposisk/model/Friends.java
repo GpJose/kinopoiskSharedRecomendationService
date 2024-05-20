@@ -30,4 +30,7 @@ public class Friends {
 
     @Column(name = "friend_id", nullable = false)
     private Long friendId;
+    @Column(name = "friend_request")
+    @Builder.Default
+    private boolean friendRequest = false;
 }

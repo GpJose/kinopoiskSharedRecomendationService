@@ -9,7 +9,7 @@ import org.hibernate.annotations.FetchMode;
 import ru.kinoposisk.model.enums.RoleEnums;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.*;
 
 
 @Entity
@@ -18,10 +18,10 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @Table(name = "users", schema = "kinopoisk_dev_service")
-public class Users {
+public class    Users {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSequence_GEN")
-    @SequenceGenerator(name = "userSequence_GEN", sequenceName = "userSequence_SEQ", allocationSize = 1)
+    @SequenceGenerator(name = "userSequence_GEN"    , sequenceName = "userSequence_SEQ", allocationSize = 1)
     private Long id;
 
     @Column(name = "login", nullable = false, unique = true)
@@ -33,20 +33,21 @@ public class Users {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "role", nullable = false)
+    @ElementCollection(targetClass = RoleEnums.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    private RoleEnums role = RoleEnums.USER;
+    private List<RoleEnums> roles = new ArrayList<>(EnumSet.of(RoleEnums.ROLE_USER));
 
-    @Column(name = "banned", nullable = false)
+    @Column(name = "active", nullable = false)
     @Builder.Default
-    private boolean banned = false;
+    private boolean active = true;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(FetchMode.SELECT)
-    private List<Friends> friends = new java.util.ArrayList<>();
+        private List<Friends> friends = new java.util.ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(FetchMode.SELECT)
     private List<QuizAnswers> quizAnswers = new java.util.ArrayList<>();
 }

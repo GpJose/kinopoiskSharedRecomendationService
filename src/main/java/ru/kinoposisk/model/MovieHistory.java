@@ -37,6 +37,9 @@ public class MovieHistory {
     @Column(name = "watched_date")
     private Date watchedDate;
 
-    @Column(name = "rating")
+    @Column(name = "rating",columnDefinition = "smallint")
     private Integer rating;
+
+    @Column(name = "comment",length = 1024)
+    private String comment;
 }

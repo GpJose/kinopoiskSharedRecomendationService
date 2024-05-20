@@ -21,24 +21,23 @@ import javax.persistence.*;
 @Data
 @Table(name = "quiz_answers", schema = "kinopoisk_dev_service")
 public class QuizAnswers {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "quiz_sequence")
     @SequenceGenerator(name = "quiz_sequence", sequenceName = "quiz_sequence", allocationSize = 1)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
     @JoinColumn(name = "users_id")
     private Users userId;
 
     @Column(name = "genre", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private GenreEnums genre;
+    private String genre;
 
     @Column(name = "duration", nullable = false)
-    private Integer duration;
+    private String duration;
 
     @Column(name = "country", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private CountryEnums country;
+    private String country;
 }
 

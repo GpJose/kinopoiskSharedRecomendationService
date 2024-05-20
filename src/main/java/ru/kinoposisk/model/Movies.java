@@ -26,8 +26,37 @@ public class Movies {
 
     @Column(name = "kinopoisk_id")
     private Long kinopoiskId;
-    @Column(name = "title")
-    private String title;
+
+    @Column(name = "kinopisk_rating")
+    private double kpRating;
+    @Column(name = "imdb_rating")
+    private double imdbRating;
+    @Column(name = "local_rating", nullable = false, columnDefinition = "фыв")
+    private double localRating;
+
+    @Column(name = "duration")
+    private Integer duration;
+    @Column(name = "type")
+    private String type;
+    @Column(name = "name")
+    private String name;
+    @Column(name = "description")
+    private String description;
+    @Column(name = "year")
+    private int year;
+
+    @Column(name = "poster_url")
+    private String url;
+    @Column(name = "preview_poster_url")
+    private String previewURL;
+    @Column(name = "logo_url")
+    private String logoURL;
+
+    @Column(name = "genres")
+    private String genres;
+    @Column(name = "countries")
+    private String countries;
+
 
     @OneToMany(mappedBy = "movie",fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = true)
     @Fetch(FetchMode.SELECT)

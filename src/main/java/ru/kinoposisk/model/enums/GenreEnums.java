@@ -1,5 +1,9 @@
 package ru.kinoposisk.model.enums;
 
+import lombok.Getter;
+import lombok.ToString;
+
+@Getter
 public enum GenreEnums {
     АНИМЕ,
     БИОГРАФИЯ,
@@ -33,4 +37,9 @@ public enum GenreEnums {
     ФИЛЬМ_НУАР,
     ФЭНТЕЗИ,
     ЦЕРЕМОНИЯ;
+
+    @Override
+    public String toString() {
+        return this.name().replaceAll("_", " ");
+    }
 }

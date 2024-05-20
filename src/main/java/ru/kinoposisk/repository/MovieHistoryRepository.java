@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface MovieHistoryRepository extends JpaRepository<MovieHistory, Long> {
-    List<MovieHistory> findByUser_Id(Long id);
+    List<MovieHistory> findByUserId(Long id);
 }

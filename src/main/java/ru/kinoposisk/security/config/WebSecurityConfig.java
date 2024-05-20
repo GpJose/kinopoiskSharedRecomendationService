@@ -1,4 +1,4 @@
-package ru.kinoposisk.security;
+package ru.kinoposisk.security.config;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -17,6 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 @Log4j2
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private UserDetailsService userDetailsService;
 
     @Bean
     @Override
@@ -30,16 +34,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/user/auth/signup").permitAll()
                 .antMatchers("/user/auth/login").permitAll()
-                .antMatchers("/kinopoisk/**").authenticated()
                 .antMatchers("/admin/**").hasAuthority("ADMIN")
+                .antMatchers("/kinopoisk/**").authenticated()
                 .antMatchers("/**").permitAll()
                 .anyRequest().permitAll()
                 .and()
                 .formLogin()
                 .loginPage("/user/auth/login")
                 .defaultSuccessUrl("/kinopoisk/profile")
-                .loginProcessingUrl("/user/auth/login")
-                .usernameParameter("username")
+                .loginProcessingUrl("/user/auth/signup")
+                .usernameParameter("login")
                 .passwordParameter("password")
                 .failureForwardUrl("/user/auth/signup")
                 .permitAll()
@@ -50,24 +54,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll();
         http.csrf().disable();
         http.cors().disable();
-
-        /* TODO
-            1) LoginController
-            2) DTO AuthUser
-            2) Cash Password
-            3) Save User with Cash Password into DB
-            4) Auth user with Cash from DB if Cash.equals(user.getPassword())
-         */
     }
 
-    @Autowired
-    public void configureAuth(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService()).passwordEncoder(passwordEncoder());
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder());
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
+
 

@@ -1,4 +1,4 @@
-package ru.kinoposisk.dto.quiz;
+package ru.kinoposisk.dao.quiz;
 
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +15,7 @@ public class QuizDTO {
 
     @NotEmpty(message = "Genre is required")
     @EnumValue(enumClass = GenreEnums.class, message = "Invalid genre")
-    private GenreEnums genre;
+    private GenreEnums[] genre;
 
     @NotEmpty(message = "Duration is required")
     @Pattern(regexp = "\\d+-\\d+", message = "The format should be 'number-number' for example '60-120'")
@@ -23,5 +23,5 @@ public class QuizDTO {
 
     @NotEmpty(message = "Country is required")
     @EnumValue(enumClass = CountryEnums.class, message = "Invalid country")
-    private CountryEnums country;
+    private CountryEnums[] country;
 }
