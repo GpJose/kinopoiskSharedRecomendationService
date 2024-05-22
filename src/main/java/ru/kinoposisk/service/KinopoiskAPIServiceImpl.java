@@ -17,7 +17,7 @@ import ru.kinoposisk.dto.response.MovieResultResponseDTO;
 import ru.kinoposisk.model.MovieHistory;
 import ru.kinoposisk.model.Users;
 import ru.kinoposisk.repository.MovieHistoryRepository;
-import ru.kinoposisk.repository.UserRepository;
+import ru.kinoposisk.repository.UsersRepository;
 import ru.kinoposisk.service.interfaces.KinopoiskAPIService;
 
 import java.net.URI;
@@ -35,13 +35,13 @@ public class KinopoiskAPIServiceImpl implements KinopoiskAPIService {
 
     private String url = "https://api.kinopoisk.dev/v1.4/movie?page=1&limit=1&selectFields=id&selectFields=name&selectFields=enName&selectFields=description&selectFields=year&selectFields=movieLength&selectFields=countries&selectFields=logo&selectFields=genres&selectFields=type&selectFields=rating&selectFields=poster&selectFields=persons&sortField=rating.kp&sortType=-1&type=movie&rating.kp=5-10&movieLength=100-500&genres.name=%2B%D0%B4%D1%80%D0%B0%D0%BC%D0%B0&genres.name=%2B%D0%BA%D0%BE%D0%BC%D0%B5%D0%B4%D0%B8%D1%8F&countries.name=%D0%A1%D0%A8%D0%90";
     private final MovieHistoryRepository movieHistoryRepository;
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
     private final RetryTemplateConfig templateConfig;
 
     @Autowired
-    public KinopoiskAPIServiceImpl(MovieHistoryRepository movieHistoryRepository, UserRepository userRepository, RetryTemplateConfig templateConfig) {
+    public KinopoiskAPIServiceImpl(MovieHistoryRepository movieHistoryRepository, UsersRepository usersRepository, RetryTemplateConfig templateConfig) {
         this.movieHistoryRepository = movieHistoryRepository;
-        this.userRepository = userRepository;
+        this.usersRepository = usersRepository;
         this.templateConfig = templateConfig;
     }
 
@@ -69,7 +69,7 @@ public class KinopoiskAPIServiceImpl implements KinopoiskAPIService {
     }
 
     public Users findUserByLogin(String login) {
-        return userRepository.findByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return usersRepository.findByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
 }

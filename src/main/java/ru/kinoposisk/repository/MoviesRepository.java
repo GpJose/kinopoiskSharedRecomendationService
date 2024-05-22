@@ -17,6 +17,4 @@ public interface MoviesRepository extends JpaRepository<Movies, Long> {
     double getAverageRatingForMovie(@Param("movieId") Long movieId);
     List<Movies> findByGenresContains(String genres);
 
-
-
 }

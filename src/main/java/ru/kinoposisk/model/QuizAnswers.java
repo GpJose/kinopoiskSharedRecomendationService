@@ -1,24 +1,24 @@
 package ru.kinoposisk.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import ru.kinoposisk.model.enums.CountryEnums;
 import ru.kinoposisk.model.enums.GenreEnums;
+import ru.kinoposisk.utils.CountryEnumConverter;
+import ru.kinoposisk.utils.GenreEnumConverter;
 
 import javax.persistence.*;
+import java.util.Date;
+import java.util.List;
 
-/**
- * Класс для хранения вопросов
- * Для представления жанра используется перечисление {@link GenreEnums}.
- * Для представления страны используется перечисление {@link CountryEnums}.
- */
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Data
+@Getter
+@Setter
+@ToString
 @Table(name = "quiz_answers", schema = "kinopoisk_dev_service")
 public class QuizAnswers {
 
@@ -27,17 +27,24 @@ public class QuizAnswers {
     @SequenceGenerator(name = "quiz_sequence", sequenceName = "quiz_sequence", allocationSize = 1)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.REFRESH)
-    @JoinColumn(name = "users_id")
-    private Users userId;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    @Fetch(FetchMode.SELECT)
+    private Users users;
 
     @Column(name = "genre", nullable = false)
-    private String genre;
+    @Convert(converter = GenreEnumConverter.class)
+    private GenreEnums[] genre;
 
     @Column(name = "duration", nullable = false)
     private String duration;
 
     @Column(name = "country", nullable = false)
-    private String country;
-}
+    @Convert(converter = CountryEnumConverter.class)
+    private CountryEnums[] country;
 
+    @Column(name = "date", nullable = false)
+    @Builder.Default
+    private Date date = new Date();
+
+}

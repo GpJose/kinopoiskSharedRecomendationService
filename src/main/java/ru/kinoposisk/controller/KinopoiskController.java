@@ -7,20 +7,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.kinoposisk.dao.auth.AuthSignUpDAO;
 import ru.kinoposisk.dao.quiz.QuizDTO;
+import ru.kinoposisk.model.MovieHistory;
 import ru.kinoposisk.model.QuizAnswers;
-import ru.kinoposisk.model.Users;
-import ru.kinoposisk.model.enums.CountryEnums;
-import ru.kinoposisk.model.enums.GenreEnums;
-import ru.kinoposisk.repository.UserRepository;
 import ru.kinoposisk.service.interfaces.KinopoiskAPIService;
+import ru.kinoposisk.service.interfaces.MovieHistoryService;
 import ru.kinoposisk.service.interfaces.QuizUsersAnswersService;
-import ru.kinoposisk.service.interfaces.UserService;
+import ru.kinoposisk.service.interfaces.UsersService;
 
 import javax.validation.Valid;
-import java.security.Principal;
-import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -29,72 +24,38 @@ import java.util.List;
 public class KinopoiskController {
 
     private final KinopoiskAPIService kinopoiskAPIService;
-    private final UserService userService;
-    private final UserRepository userRepository;
-    private final QuizUsersAnswersService quizUsers;
+    private final UsersService usersService;
+    private final QuizUsersAnswersService quizUsersAnswersService;
+    private final MovieHistoryService movieHistoryService;
 
     @Autowired
     public KinopoiskController(KinopoiskAPIService kinopoiskAPIService,
-                               UserService userRepository1,
-                               UserRepository userRepository, QuizUsersAnswersService quizUsers) {
+                               UsersService userRepository1,
+                               QuizUsersAnswersService quizUsersAnswersService, MovieHistoryService movieHistoryService) {
         this.kinopoiskAPIService = kinopoiskAPIService;
-        this.userService = userRepository1;
-        this.userRepository = userRepository;
-        this.quizUsers = quizUsers;
+        this.usersService = userRepository1;
+        this.quizUsersAnswersService = quizUsersAnswersService;
+        this.movieHistoryService = movieHistoryService;
     }
 
     @GetMapping(path = "sendRequest")
-    public ResponseEntity<String> sendRequest(@Valid @RequestBody Users user) {
+    public ResponseEntity<String> sendRequest(@Valid @RequestBody Authentication authentication) {
 
-        kinopoiskAPIService.sendRequest(user);
+        kinopoiskAPIService.sendRequest(usersService.findByLogin(authentication.getName()));
         return ResponseEntity.ok().body("success");
     }
 
-    @GetMapping(path = "test")
-    public ResponseEntity<String> test() {
-
-        // TODO Создание двух пользователей, прохождение вопросов, получения реузльтатов поиска
-
-        return ResponseEntity.ok().body(quizUsers.getGenreQuizList());
-    }
-
-    @GetMapping(value = "username")
-    public String currentUserName(Principal principal) {
-        return principal.getName();
-    }
-    @GetMapping(value = "username2")
-    public String currentUserName(Authentication authentication) {
-        return authentication.getName();
-    }
-
-
     @GetMapping(path = "quiz")
-    public ResponseEntity<QuizDTO> getQuiz() {
+    public ResponseEntity<List<QuizAnswers>> getQuiz(Authentication authentication) {
 
-        return ResponseEntity.ok().body(QuizDTO.builder()
-                .country(CountryEnums.values())
-                .duration("60-120")
-                .genre(GenreEnums.values())
-                .build());
+        return ResponseEntity.ok().body(quizUsersAnswersService.findByUserLogin(authentication.getName()));
     }
     @PostMapping(path = "quiz")
     public ResponseEntity<String> setQuiz(@Valid @RequestBody QuizDTO quizDTO, Authentication authentication) {
 
         try {
-            String login = authentication.getName();
-            Users user = userRepository.findByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-            QuizAnswers quizAnswers = QuizAnswers.builder()
-                    .userId(user)
-                    .duration(quizDTO.getDuration())
-                    .genre(Arrays.toString(quizDTO.getGenre()))
-                    .country(Arrays.toString(quizDTO.getCountry()))
-                    .build();
-
-            List<QuizAnswers> quizAnswersList = user.getQuizAnswers();
-            quizAnswersList.add(quizAnswers);
-            user.setQuizAnswers(quizAnswersList);
-            userRepository.save(user);
+            quizUsersAnswersService.add(quizUsersAnswersService.build(quizDTO, authentication.getName()));
 
             return ResponseEntity.status(HttpStatus.CREATED).body("Success");
         }
@@ -102,6 +63,11 @@ public class KinopoiskController {
 
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
+    }
+    @GetMapping(path = "MovieHistory")
+    public ResponseEntity<List<MovieHistory>> getMovieHistory(@PathVariable Authentication authentication) {
+
+        return ResponseEntity.ok().body(movieHistoryService.get(usersService.findByLogin(authentication.getName())));
     }
 
     /*

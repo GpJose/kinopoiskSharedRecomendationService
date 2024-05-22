@@ -7,23 +7,23 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.kinoposisk.model.Users;
-import ru.kinoposisk.repository.UserRepository;
+import ru.kinoposisk.repository.UsersRepository;
 
 @Service
 @Log4j2
 public class UserDetailServiceImpl implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UsersRepository usersRepository;
 
     @Autowired
-    public UserDetailServiceImpl(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserDetailServiceImpl(UsersRepository usersRepository) {
+        this.usersRepository = usersRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String Login) throws UsernameNotFoundException {
         log.info("loadUserByUsername: " + Login);
-        Users user = userRepository.findByLogin(Login).orElseThrow(() -> new UsernameNotFoundException("User with login:"+Login+ " not found"));
+        Users user = usersRepository.findByLogin(Login).orElseThrow(() -> new UsernameNotFoundException("User with login:"+Login+ " not found"));
         log.info("loadedUserByUsername: " + user);
         return new UserDetailImpl(user);
     }

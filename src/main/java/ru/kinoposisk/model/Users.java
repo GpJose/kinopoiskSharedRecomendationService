@@ -1,19 +1,20 @@
 package ru.kinoposisk.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import ru.kinoposisk.model.enums.RoleEnums;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 
 @Entity
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -45,10 +46,13 @@ public class    Users {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(FetchMode.SELECT)
-        private List<Friends> friends = new java.util.ArrayList<>();
+    @Builder.Default
+    private List<Friends> friends = new java.util.ArrayList<>();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("users, date  desc")
     @Fetch(FetchMode.SELECT)
-    private List<QuizAnswers> quizAnswers = new java.util.ArrayList<>();
+    @Builder.Default
+    private List<QuizAnswers> quizAnswers = new ArrayList<>();
 }
 

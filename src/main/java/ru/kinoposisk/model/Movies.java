@@ -31,8 +31,6 @@ public class Movies {
     private double kpRating;
     @Column(name = "imdb_rating")
     private double imdbRating;
-    @Column(name = "local_rating", nullable = false, columnDefinition = "фыв")
-    private double localRating;
 
     @Column(name = "duration")
     private Integer duration;

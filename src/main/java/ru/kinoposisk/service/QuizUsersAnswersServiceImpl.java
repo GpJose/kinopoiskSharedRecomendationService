@@ -2,15 +2,16 @@ package ru.kinoposisk.service;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import ru.kinoposisk.dao.quiz.QuizDTO;
 import ru.kinoposisk.model.QuizAnswers;
-import ru.kinoposisk.model.Users;
 import ru.kinoposisk.model.enums.CountryEnums;
 import ru.kinoposisk.model.enums.GenreEnums;
 import ru.kinoposisk.repository.QuizRepository;
-import ru.kinoposisk.repository.UserRepository;
+import ru.kinoposisk.repository.UsersRepository;
 import ru.kinoposisk.service.interfaces.QuizUsersAnswersService;
-import ru.kinoposisk.service.interfaces.UserService;
+import ru.kinoposisk.service.interfaces.UsersService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,14 +23,14 @@ import java.util.NoSuchElementException;
 public class QuizUsersAnswersServiceImpl implements QuizUsersAnswersService {
 
     private final QuizRepository quizRepository;
-    private final UserRepository userRepository;
-    private final UserService userService;
+    private final UsersRepository usersRepository;
+    private final UsersService usersService;
 
     @Autowired
-    public QuizUsersAnswersServiceImpl(QuizRepository quizRepository, UserRepository userRepository, UserService userService) {
+    public QuizUsersAnswersServiceImpl(QuizRepository quizRepository, UsersRepository usersRepository, UsersService usersService) {
         this.quizRepository = quizRepository;
-        this.userRepository = userRepository;
-        this.userService = userService;
+        this.usersRepository = usersRepository;
+        this.usersService = usersService;
     }
 
     @Override
@@ -43,7 +44,8 @@ public class QuizUsersAnswersServiceImpl implements QuizUsersAnswersService {
         if (login == null || quizAnswers.getGenre() == null || quizAnswers.getDuration() == null || quizAnswers.getCountry() == null) {
             throw new IllegalArgumentException("One of the parameters is null");
         }
-//
+
+
 //        Users user = userRepository.findByLogin(login);
 //        log.info(">>>setQuizListByIdAndAnswers, quizAnsers : "+quizAnswers.toString());
 //        user.getQuizAnswers().add(quizAnswers);
@@ -51,10 +53,11 @@ public class QuizUsersAnswersServiceImpl implements QuizUsersAnswersService {
 //
 //        userRepository.save(user);
     }
-    @Override
-    public QuizAnswers get(String login) {
 
-        return null;
+    @Override
+    public QuizAnswers get(Long id) {
+
+        return quizRepository.findById(id).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Override
@@ -68,19 +71,25 @@ public class QuizUsersAnswersServiceImpl implements QuizUsersAnswersService {
     }
 
     @Override
-    public QuizAnswers findByUserID(Long id) {
-        return null;
+    public List<QuizAnswers> findByUserID(Long id) {
+
+        return quizRepository.findByUsers_Id(id).orElseThrow(() -> new UsernameNotFoundException("Answers not found"));
     }
 
     @Override
-    public QuizAnswers findByUserLogin(String login) {
-        return null;
+    public List<QuizAnswers> findByUserLogin(String login) {
+
+        return quizRepository.findByUsers_Login(login).orElseThrow(() -> new UsernameNotFoundException("Answers not found"));
     }
 
 
     @Override
     public QuizAnswers add(QuizAnswers quizAnswers) {
-        return null;
+
+        if (quizAnswers.getUsers() == null || quizAnswers.getGenre() == null || quizAnswers.getDuration() == null || quizAnswers.getCountry() == null) {
+            throw new IllegalArgumentException("One of the parameters is null");
+        }
+        return quizRepository.save(quizAnswers);
     }
 
     @Override
@@ -93,9 +102,20 @@ public class QuizUsersAnswersServiceImpl implements QuizUsersAnswersService {
         return null;
     }
 
+    @Override
     public List<QuizAnswers> getAll() {
-        List<QuizAnswers> quizAnswersList = new ArrayList<>();
-//        quizAnswersList
-        return null;
+
+        return quizRepository.findAll();
+    }
+
+    @Override
+    public QuizAnswers build(QuizDTO quizDTO, String login) {
+
+        return  QuizAnswers.builder()
+                .users(usersService.findByLogin(login))
+                .duration(quizDTO.getDuration())
+                .genre(quizDTO.getGenre())
+                .country(quizDTO.getCountry())
+                .build();
     }
 }

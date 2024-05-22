@@ -10,7 +10,6 @@ import ru.kinoposisk.repository.MoviesRepository;
 import ru.kinoposisk.service.interfaces.MoviesService;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class MoviesServiceImpl implements MoviesService {
@@ -77,11 +76,9 @@ public class MoviesServiceImpl implements MoviesService {
     }
 
     @Override
-    public void updateAvgMovieRating(Movies movies) {
+    public Movies getMovieById(Long id) {
 
-        Movies moviesTemp = findByID(movies.getId());
-        moviesTemp.setLocalRating(moviesRepository.getAverageRatingForMovie(moviesTemp.getId()));
-        moviesRepository.save(moviesTemp);
+        return moviesRepository.findById(id).orElseThrow(() -> new MovieNotFoundByIdException(id));
     }
     public void movieBuilder(MovieResultResponseDTO movieResultResponseDTO) {
         // TODO movieResponseBuilder
@@ -91,11 +88,6 @@ public class MoviesServiceImpl implements MoviesService {
             }
 
         }
-    }
-
-    private boolean checkMovieIsExist(Long id) {
-
-        return !moviesRepository.findByKinopoiskId(id).isPresent();
     }
 
     private boolean checkMovieIsExist(Movies movies) {

@@ -9,7 +9,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.validation.annotation.Validated;
@@ -18,8 +17,7 @@ import ru.kinoposisk.dao.auth.AuthLoginDAO;
 import ru.kinoposisk.dao.auth.AuthSignUpDAO;
 import ru.kinoposisk.dao.changePass.ChangePassByEmailDAO;
 import ru.kinoposisk.dao.changePass.ChangePassByLoginDAO;
-import ru.kinoposisk.model.Users;
-import ru.kinoposisk.service.interfaces.UserService;
+import ru.kinoposisk.service.interfaces.UsersService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,12 +33,12 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
 
-    private final UserService userService;
+    private final UsersService usersService;
     @Autowired
-    public AuthController(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, UserService userService) {
+    public AuthController(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, UsersService usersService) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
-        this.userService = userService;
+        this.usersService = usersService;
     }
 
     @GetMapping(value = "/login")
@@ -86,12 +84,15 @@ public class AuthController {
     }
 
     @PostMapping(value = "/signup")
-    public ResponseEntity<Void> singingUP(@Valid @RequestBody AuthSignUpDAO authSignUpDAO, HttpServletResponse response) {
+    public ResponseEntity<Void> singingUP(@Valid @RequestBody AuthSignUpDAO authSignUpDAO
+//            , HttpServletResponse response
+    )
+    {
 
         try {
 
             authSignUpDAO.setPassword(passwordEncoder.encode(authSignUpDAO.getPassword()));
-            userService.add(authSignUpDAO);
+            usersService.add(authSignUpDAO);
             //            response.sendRedirect("/kinopoisk/api/quiz");
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
@@ -104,7 +105,7 @@ public class AuthController {
     public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePassByEmailDAO changePassByEmailDAO) {
 
         try {
-            userService.changePassword(changePassByEmailDAO);
+            usersService.changePassword(changePassByEmailDAO);
 
         } catch (IOException e) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -115,7 +116,7 @@ public class AuthController {
     public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePassByLoginDAO changePassByLoginDAO) {
 
         try {
-            userService.changePassword(changePassByLoginDAO);
+            usersService.changePassword(changePassByLoginDAO);
 
         } catch (IOException e) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
