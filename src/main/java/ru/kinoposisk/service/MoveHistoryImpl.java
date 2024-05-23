@@ -35,9 +35,9 @@ public class MoveHistoryImpl implements MovieHistoryService {
     }
 
     @Override
-    public List<MovieHistory> findByLogin(String login) {
+    public List<MovieHistory> findByUser(Users user) {
 
-        return movieHistoryRepository.findByUser_Login(usersService.findByLogin(login).getLogin());
+        return movieHistoryRepository.findByUser(user);
     }
 
     @Override

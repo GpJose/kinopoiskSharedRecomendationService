@@ -15,7 +15,7 @@ import java.util.List;
 public interface MovieHistoryRepository extends JpaRepository<MovieHistory, Long> {
     List<MovieHistory> findByUserId(Long id);
 
-    List<MovieHistory> findByUser_Login(String login);
+    List<MovieHistory> findByUser(Users user);
 
     List<MovieHistory> findByUser_LoginAndMovie_LocalRatingNotNull(String login);
 

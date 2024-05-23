@@ -6,8 +6,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import ru.kinoposisk.model.enums.FriendsRequestStatusEnum;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Data
@@ -30,7 +32,13 @@ public class Friends {
 
     @Column(name = "friend_id", nullable = false)
     private Long friendId;
-    @Column(name = "friend_request")
+
+    @Column(name = "date")
     @Builder.Default
-    private boolean friendRequest = false;
+    private Date date = new Date();
+
+    @Column(name = "friend_request_status")
+    @Enumerated(EnumType.STRING)
+    private FriendsRequestStatusEnum friendRequestStatus;
+
 }

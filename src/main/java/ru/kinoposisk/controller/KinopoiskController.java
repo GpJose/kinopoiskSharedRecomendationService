@@ -8,18 +8,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.kinoposisk.dao.quiz.QuizDTO;
+import ru.kinoposisk.model.Friends;
 import ru.kinoposisk.model.MovieHistory;
 import ru.kinoposisk.model.QuizAnswers;
-import ru.kinoposisk.service.interfaces.KinopoiskAPIService;
-import ru.kinoposisk.service.interfaces.MovieHistoryService;
-import ru.kinoposisk.service.interfaces.QuizUsersAnswersService;
-import ru.kinoposisk.service.interfaces.UsersService;
+import ru.kinoposisk.service.interfaces.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "kinopoisk/api/")
+@RequestMapping(path = "kinopoisk/profile/")
 @Validated
 public class KinopoiskController {
 
@@ -27,15 +25,17 @@ public class KinopoiskController {
     private final UsersService usersService;
     private final QuizUsersAnswersService quizUsersAnswersService;
     private final MovieHistoryService movieHistoryService;
+    private final FriendsService friendsService;
 
     @Autowired
     public KinopoiskController(KinopoiskAPIService kinopoiskAPIService,
                                UsersService userRepository1,
-                               QuizUsersAnswersService quizUsersAnswersService, MovieHistoryService movieHistoryService) {
+                               QuizUsersAnswersService quizUsersAnswersService, MovieHistoryService movieHistoryService, FriendsService friendsService) {
         this.kinopoiskAPIService = kinopoiskAPIService;
         this.usersService = userRepository1;
         this.quizUsersAnswersService = quizUsersAnswersService;
         this.movieHistoryService = movieHistoryService;
+        this.friendsService = friendsService;
     }
 
     @GetMapping(path = "sendRequest")
@@ -53,27 +53,59 @@ public class KinopoiskController {
     @PostMapping(path = "quiz")
     public ResponseEntity<String> setQuiz(@Valid @RequestBody QuizDTO quizDTO, Authentication authentication) {
 
-        try {
+        quizUsersAnswersService.add(quizUsersAnswersService.build(quizDTO, authentication.getName()));
 
-            quizUsersAnswersService.add(quizUsersAnswersService.build(quizDTO, authentication.getName()));
-
-            return ResponseEntity.status(HttpStatus.CREATED).body("Success");
-        }
-        catch (UsernameNotFoundException e) {
-
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        }
+        return ResponseEntity.status(HttpStatus.CREATED).body("Success");
     }
-    @GetMapping(path = "MovieHistory")
-    public ResponseEntity<List<MovieHistory>> getMovieHistory(@PathVariable Authentication authentication) {
+    @GetMapping(path = "movieHistory")
+    public ResponseEntity<List<MovieHistory>> getMovieHistory(Authentication authentication) {
 
-        return ResponseEntity.ok().body(movieHistoryService.get(usersService.findByLogin(authentication.getName())));
+        return ResponseEntity.ok().body(movieHistoryService.findByUser(usersService.findByLogin(authentication.getName())));
     }
+
+    @GetMapping(path = "friends")
+    public ResponseEntity<List<Friends>> getFriends(Authentication authentication) {
+
+        return ResponseEntity.ok().body(friendsService.findAllFriendsByUsers(usersService.findByLogin(authentication.getName())));
+    }
+
+    @GetMapping(path = "friends/friendsRequests")
+    public ResponseEntity<List<Friends>> getFriendsRequests(Authentication authentication) {
+
+        return ResponseEntity.ok().body(friendsService.findAllFriendsRequestByUser(usersService.findByLogin(authentication.getName())));
+    }
+
+    @GetMapping(path = "friends/{friendLogin}")
+    public ResponseEntity<Friends> getFriendInfo(Authentication authentication, @PathVariable String friendLogin) {
+
+        // TODO : Проверить друзья ли они. Если друзья - возвращаем профиль друга.
+        // TODO :
+        return ResponseEntity.status(HttpStatus.OK).body(friendsService.findUserFriendByLogin(
+                authentication.getName(), friendsService.find
+        ));
+    }
+
+    @PostMapping(path = "friends/{friendLogin}/sendFriendRequest")
+    public ResponseEntity<String> sendFriendRequest(Authentication authentication, @PathVariable String friendLogin) {
+
+        usersService.findByLogin(authentication.getName());
+        usersService.findByLogin(friendLogin);
+
+    }
+
+    @GetMapping(path = "friends/{friendLogin}/status")
+    public ResponseEntity<Friends> getFriendStatus(Authentication authentication, @PathVariable String friendLogin) {
+
+        // TODO get status request by friendLogin
+        return ResponseEntity.status(HttpStatus.OK).body(friendsService.findUserFriendByLogin(
+                authentication.getName(), friendLogin
+        ));
+    }
+
 
     /*
         TODO : 1) История просмотров фильмов.
         TODO : Прохождение вопросов
-        TODO : 2) Список всех пользвателей
         TODO : 3) Добавление пользователей в друзья
         TODO : 4) Получение рекомендаций по фильму с учетом последних 10ти фильмов или опроса
         TODO : 5) Получение рекомендаций по фильму вместе с другом с учетом последних 10ти фильмов или опроса

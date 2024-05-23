@@ -42,7 +42,7 @@ public class AdminServiceImpl implements AdminService {
     @Override
     public List<MovieHistory> getAllHistoryByUsername(String login) {
 
-        return movieHistoryService.findByLogin(usersService.findByLogin(login).getLogin());
+        return movieHistoryService.findByUser(usersService.findByLogin(login));
     }
     @Override
     public List<MovieHistory> getAllRatingsByUsername(String login) {

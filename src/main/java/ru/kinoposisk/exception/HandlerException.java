@@ -55,18 +55,20 @@ public class HandlerException {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ResponseStatus(HttpStatus.EXPECTATION_FAILED)
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleValidationExceptions(Exception ex) {
-        ex.printStackTrace();
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.EXPECTATION_FAILED);
-    }
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MovieNotFoundByIdException.class)
     public ResponseEntity<String> handleValidationExceptions(MovieNotFoundByIdException ex) {
 
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleValidationExceptions(Exception ex) {
+        ex.printStackTrace();
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 
 //    @ExceptionHandler({MethodArgumentNotValidException.class, UsernameNotFoundException.class, DuplicateKeyException.class, IOException.class, Exception.class})
 //    public ResponseEntity<Object> handleExceptions(Exception ex) {

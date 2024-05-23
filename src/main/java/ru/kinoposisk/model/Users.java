@@ -34,7 +34,7 @@ public class    Users {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @ElementCollection(targetClass = RoleEnums.class, fetch = FetchType.EAGER)
+    @ElementCollection(targetClass = RoleEnums.class, fetch = FetchType.LAZY)
     @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
     @Builder.Default
@@ -44,7 +44,7 @@ public class    Users {
     @Builder.Default
     private boolean active = true;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "userId", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(FetchMode.SELECT)
     @Builder.Default
     private List<Friends> friends = new java.util.ArrayList<>();

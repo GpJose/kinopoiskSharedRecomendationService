@@ -58,7 +58,7 @@ public class AdminController {
 
         return ResponseEntity.status(HttpStatus.OK).body(adminService.getUser(login).isActive());
     }
-    @PostMapping(value = "users/{login}/block")
+    @PutMapping(value = "users/{login}/block")
     public ResponseEntity<Boolean> blockUser(@PathVariable String login) {
 
         return ResponseEntity.status(HttpStatus.OK).body(adminService.blockUser(login));
