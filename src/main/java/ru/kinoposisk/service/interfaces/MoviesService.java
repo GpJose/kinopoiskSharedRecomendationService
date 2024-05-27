@@ -1,7 +1,6 @@
 package ru.kinoposisk.service.interfaces;
 
 import ru.kinoposisk.model.Movies;
-import ru.kinoposisk.model.Users;
 
 import java.util.List;
 

@@ -1,5 +1,6 @@
 package ru.kinoposisk.controller;
 
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,16 +14,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.kinoposisk.dao.auth.AuthLoginDAO;
-import ru.kinoposisk.dao.auth.AuthSignUpDAO;
-import ru.kinoposisk.dao.changePass.ChangePassByEmailDAO;
-import ru.kinoposisk.dao.changePass.ChangePassByLoginDAO;
+import ru.kinoposisk.dto.auth.AuthLoginDTO;
+import ru.kinoposisk.dto.auth.AuthSignUpDTO;
+import ru.kinoposisk.dto.changePass.ChangePassByEmailDTO;
+import ru.kinoposisk.dto.changePass.ChangePassByLoginDTO;
 import ru.kinoposisk.service.interfaces.UsersService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 
 @RestController
 @RequestMapping(path ="/user/auth/")
@@ -42,22 +42,20 @@ public class AuthController {
     }
 
     @GetMapping(value = "/login")
-    public ResponseEntity<AuthLoginDAO> loginDao() {
-        return ResponseEntity.status(HttpStatus.OK).body(AuthLoginDAO.builder()
+    public ResponseEntity<AuthLoginDTO> loginDao() {
+        return ResponseEntity.status(HttpStatus.OK).body(AuthLoginDTO.builder()
                 .login("Enter your login")
                 .password("Enter your password")
                 .build());
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<String> performLogin(@Valid @RequestBody AuthLoginDAO authLoginDAO) {
-
-        log.info(authLoginDAO.toString());
+    public ResponseEntity<String> performLogin(@Valid @RequestBody AuthLoginDTO authLoginDTO) {
 
         try {
 
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authLoginDAO.getLogin(), authLoginDAO.getPassword()));
+                    new UsernamePasswordAuthenticationToken(authLoginDTO.getLogin(), authLoginDTO.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             return ResponseEntity.ok().build();
@@ -76,7 +74,8 @@ public class AuthController {
 
     @GetMapping(value = "/signup")
     public ResponseEntity<String> singUP() {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(AuthSignUpDAO.builder()
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(AuthSignUpDTO.builder()
                 .login("Enter your login")
                 .password("Enter your password")
                 .email("Enter your email")
@@ -84,60 +83,42 @@ public class AuthController {
     }
 
     @PostMapping(value = "/signup")
-    public ResponseEntity<Void> singingUP(@Valid @RequestBody AuthSignUpDAO authSignUpDAO
+    public ResponseEntity<Void> singingUP(@Valid @RequestBody AuthSignUpDTO authSignUpDTO
 //            , HttpServletResponse response
     )
     {
 
-        try {
-
-            authSignUpDAO.setPassword(passwordEncoder.encode(authSignUpDAO.getPassword()));
-            usersService.add(authSignUpDAO);
+            authSignUpDTO.setPassword(passwordEncoder.encode(authSignUpDTO.getPassword()));
+            usersService.add(authSignUpDTO);
             //            response.sendRedirect("/kinopoisk/api/quiz");
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
-        }
-        catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
+    @SneakyThrows
     @PostMapping(value = "/changePasswordByEmail")
-    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePassByEmailDAO changePassByEmailDAO) {
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePassByEmailDTO changePassByEmailDTO) {
 
-        try {
-            usersService.changePassword(changePassByEmailDAO);
+            usersService.changePassword(changePassByEmailDTO);
 
-        } catch (IOException e) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Password has been changed to user with email: " + changePassByEmailDAO.getEmail());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Password has been changed to user with email: " + changePassByEmailDTO.getEmail());
     }
+    @SneakyThrows
     @PostMapping(value = "/changePasswordByLogin")
-    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePassByLoginDAO changePassByLoginDAO) {
+    public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePassByLoginDTO changePassByLoginDTO) {
 
-        try {
-            usersService.changePassword(changePassByLoginDAO);
+            usersService.changePassword(changePassByLoginDTO);
 
-        } catch (IOException e) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Password has been changed to user with login: " + changePassByLoginDAO.getLogin());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Password has been changed to user with login: " + changePassByLoginDTO.getLogin());
     }
 
+    @SneakyThrows
     @PostMapping(value = "/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-
-        try {
 
             SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
             logoutHandler.logout(request, response, authentication);
             request.getSession().invalidate();
-
             response.sendRedirect(request.getContextPath() + "/login");
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

@@ -1,4 +1,4 @@
-package ru.kinoposisk.dao.changePass;
+package ru.kinoposisk.dto.changePass;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +13,7 @@ import javax.validation.constraints.Size;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChangePassByLoginDAO {
+public class ChangePassByLoginDTO {
 
     @NotEmpty(message = "Login is required")
     @Size(min = 4, max = 20, message = "Login must be between 4 and 20 characters")

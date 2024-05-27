@@ -1,4 +1,4 @@
-package ru.kinoposisk.dao.changePass;
+package ru.kinoposisk.dto.changePass;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChangePassByEmailDAO {
+public class ChangePassByEmailDTO {
 
     @NotEmpty(message = "Email is required")
     @Email(message = "Email should be valid")

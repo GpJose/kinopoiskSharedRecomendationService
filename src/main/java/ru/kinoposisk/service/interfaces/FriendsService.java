@@ -1,17 +1,27 @@
 package ru.kinoposisk.service.interfaces;
 
+import ru.kinoposisk.dto.profile.UserProfileDTO;
+import ru.kinoposisk.exception.friendsExceptions.FriendsAccessDenyException;
 import ru.kinoposisk.model.Friends;
 import ru.kinoposisk.model.Users;
+import ru.kinoposisk.model.enums.FriendsRequestStatusEnum;
 
 import java.util.List;
 
 public interface FriendsService  {
 
-    Friends add(Friends friends, String login);
+    void add(Users user, Users friend);
 
-    Friends add(Friends friends, Users user);
+//    List<Friends> getAllFriendsByUsers(Users user);
 
-    List<Friends> findAllFriendsByUsers(Users user);
+    void removeFriend(Users user, Users friend);
 
-    List<Friends> findAllFriendsRequestByUser(Users user);
+    List<Friends> getAllFriendsRequestByUser(Users user);
+
+    Friends sendFriendRequest(Users user, Users friend);
+
+    FriendsRequestStatusEnum findFriendRequestStatus(Users user, Users friend);
+
+    UserProfileDTO getFriendProfile(Users user, Users friend) throws FriendsAccessDenyException;
+
 }

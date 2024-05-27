@@ -10,7 +10,6 @@ import ru.kinoposisk.utils.GenreEnumConverter;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
 
 @Entity
 @AllArgsConstructor

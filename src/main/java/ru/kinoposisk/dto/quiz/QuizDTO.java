@@ -1,4 +1,4 @@
-package ru.kinoposisk.dao.quiz;
+package ru.kinoposisk.dto.quiz;
 
 import lombok.Builder;
 import lombok.Data;

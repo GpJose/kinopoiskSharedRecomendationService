@@ -10,11 +10,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import ru.kinoposisk.exception.friendsExceptions.FriendsAccessDenyException;
 import ru.kinoposisk.exception.moviesExceptions.MovieNotFoundByIdException;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @ControllerAdvice
@@ -33,6 +33,15 @@ public class HandlerException {
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
+
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler({UsernameNotFoundException.class})
+    public ResponseEntity<String> handleValidationExceptions(FriendsAccessDenyException ex) {
+
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({UsernameNotFoundException.class})

@@ -39,7 +39,4 @@ public class MovieHistory {
 
     @Column(name = "rating",columnDefinition = "smallint")
     private Integer rating;
-
-    @Column(name = "comment",length = 1024)
-    private String comment;
 }

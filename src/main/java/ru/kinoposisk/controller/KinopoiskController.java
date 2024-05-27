@@ -1,16 +1,17 @@
 package ru.kinoposisk.controller;
 
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.kinoposisk.dao.quiz.QuizDTO;
+import ru.kinoposisk.dto.profile.UserProfileDTO;
+import ru.kinoposisk.dto.quiz.QuizDTO;
 import ru.kinoposisk.model.Friends;
-import ru.kinoposisk.model.MovieHistory;
 import ru.kinoposisk.model.QuizAnswers;
+import ru.kinoposisk.model.enums.FriendsRequestStatusEnum;
 import ru.kinoposisk.service.interfaces.*;
 
 import javax.validation.Valid;
@@ -24,32 +25,43 @@ public class KinopoiskController {
     private final KinopoiskAPIService kinopoiskAPIService;
     private final UsersService usersService;
     private final QuizUsersAnswersService quizUsersAnswersService;
-    private final MovieHistoryService movieHistoryService;
     private final FriendsService friendsService;
 
     @Autowired
     public KinopoiskController(KinopoiskAPIService kinopoiskAPIService,
-                               UsersService userRepository1,
-                               QuizUsersAnswersService quizUsersAnswersService, MovieHistoryService movieHistoryService, FriendsService friendsService) {
+                               UsersService usersService,
+                               QuizUsersAnswersService quizUsersAnswersService,
+                               FriendsService friendsService) {
+
         this.kinopoiskAPIService = kinopoiskAPIService;
-        this.usersService = userRepository1;
+        this.usersService = usersService;
         this.quizUsersAnswersService = quizUsersAnswersService;
-        this.movieHistoryService = movieHistoryService;
         this.friendsService = friendsService;
     }
 
+    // Профиль пользователя
+    @GetMapping(path = "profile")
+    public ResponseEntity<UserProfileDTO> getProfile(Authentication authentication) {
+
+        return ResponseEntity.ok().body(usersService.getProfile(usersService.findByLogin(authentication.getName())));
+    }
+
+    // Отправка запроса в кинопоиск
     @GetMapping(path = "sendRequest")
     public ResponseEntity<String> sendRequest(@Valid @RequestBody Authentication authentication) {
 
         kinopoiskAPIService.sendRequest(usersService.findByLogin(authentication.getName()));
-        return ResponseEntity.ok().body("success");
+        return ResponseEntity.ok().body("Success");
     }
 
+    // Получение всех ответов на вопросы
     @GetMapping(path = "quiz")
     public ResponseEntity<List<QuizAnswers>> getQuiz(Authentication authentication) {
 
         return ResponseEntity.ok().body(quizUsersAnswersService.findByUserLogin(authentication.getName()));
     }
+
+    // Отправка ответов на вопросы
     @PostMapping(path = "quiz")
     public ResponseEntity<String> setQuiz(@Valid @RequestBody QuizDTO quizDTO, Authentication authentication) {
 
@@ -57,61 +69,73 @@ public class KinopoiskController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Success");
     }
-    @GetMapping(path = "movieHistory")
-    public ResponseEntity<List<MovieHistory>> getMovieHistory(Authentication authentication) {
 
-        return ResponseEntity.ok().body(movieHistoryService.findByUser(usersService.findByLogin(authentication.getName())));
-    }
-
-    @GetMapping(path = "friends")
-    public ResponseEntity<List<Friends>> getFriends(Authentication authentication) {
-
-        return ResponseEntity.ok().body(friendsService.findAllFriendsByUsers(usersService.findByLogin(authentication.getName())));
-    }
-
+    // Просмотр запросов в друзья пользователя
     @GetMapping(path = "friends/friendsRequests")
     public ResponseEntity<List<Friends>> getFriendsRequests(Authentication authentication) {
 
-        return ResponseEntity.ok().body(friendsService.findAllFriendsRequestByUser(usersService.findByLogin(authentication.getName())));
+        return ResponseEntity.ok().body(friendsService.getAllFriendsRequestByUser(usersService.findByLogin(authentication.getName())));
     }
 
+    @PostMapping(path = "friends/friendsRequests/{friendLogin}")
+    public ResponseEntity<String> getFriendsRequests(Authentication authentication, @PathVariable String friendLogin) {
+
+        friendsService.add(usersService.findByLogin(authentication.getName()),usersService.findByLogin(friendLogin));
+
+        return ResponseEntity.ok().body("Success");
+    }
+
+    // Получение профиля друга
+    @SneakyThrows
     @GetMapping(path = "friends/{friendLogin}")
-    public ResponseEntity<Friends> getFriendInfo(Authentication authentication, @PathVariable String friendLogin) {
+    public ResponseEntity<UserProfileDTO> getFriendProfile(Authentication authentication, @PathVariable String friendLogin) {
 
-        // TODO : Проверить друзья ли они. Если друзья - возвращаем профиль друга.
-        // TODO :
-        return ResponseEntity.status(HttpStatus.OK).body(friendsService.findUserFriendByLogin(
-                authentication.getName(), friendsService.find
-        ));
+        return ResponseEntity.status(HttpStatus.OK).body(friendsService.getFriendProfile(
+                usersService.findByLogin(authentication.getName()),
+                usersService.findByLogin(friendLogin)));
     }
 
+    @DeleteMapping(path = "friends/{friendLogin}")
+    public ResponseEntity<String> removeFriend(Authentication authentication, @PathVariable String friendLogin) {
+
+        friendsService.removeFriend(
+                usersService.findByLogin(authentication.getName()),
+                usersService.findByLogin(friendLogin));
+
+        return ResponseEntity.status(HttpStatus.OK).body("Has been deleted");
+    }
+
+
+    // Отправка запроса в друзья
     @PostMapping(path = "friends/{friendLogin}/sendFriendRequest")
     public ResponseEntity<String> sendFriendRequest(Authentication authentication, @PathVariable String friendLogin) {
 
-        usersService.findByLogin(authentication.getName());
-        usersService.findByLogin(friendLogin);
+        friendsService.sendFriendRequest(
+                usersService.findByLogin(authentication.getName()),
+                usersService.findByLogin(friendLogin));
 
+        return  ResponseEntity.status(HttpStatus.CREATED).body("Success");
     }
 
-    @GetMapping(path = "friends/{friendLogin}/status")
-    public ResponseEntity<Friends> getFriendStatus(Authentication authentication, @PathVariable String friendLogin) {
 
-        // TODO get status request by friendLogin
-        return ResponseEntity.status(HttpStatus.OK).body(friendsService.findUserFriendByLogin(
-                authentication.getName(), friendLogin
-        ));
+    // Просмотр статуса заявки в друзья
+    @GetMapping(path = "friends/{friendLogin}/status")
+    public ResponseEntity<FriendsRequestStatusEnum> getFriendStatus(Authentication authentication, @PathVariable String friendLogin) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(
+                        friendsService.findFriendRequestStatus(
+                                usersService.findByLogin(authentication.getName()),
+                                usersService.findByLogin(friendLogin)
+                        ));
     }
 
 
     /*
-        TODO : 1) История просмотров фильмов.
-        TODO : Прохождение вопросов
-        TODO : 3) Добавление пользователей в друзья
         TODO : 4) Получение рекомендаций по фильму с учетом последних 10ти фильмов или опроса
         TODO : 5) Получение рекомендаций по фильму вместе с другом с учетом последних 10ти фильмов или опроса
         TODO : 6) Выставление оценки фильму и комментарий к фильму
-        TODO : 7) Просмотр комментариев и оценки к фильму другого пользователя
-        TODO : 8) Просмотр оценки фильмов других пользователей
         TODO : 10) Отправка рекомендаций на почту по фильмам раз в месяц
      */
 }

@@ -25,13 +25,15 @@ public class Friends {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     @Fetch(FetchMode.SELECT)
     private Users userId;
 
-    @Column(name = "friend_id", nullable = false)
-    private Long friendId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    @Fetch(FetchMode.JOIN)
+    private Users friendId;
 
     @Column(name = "date")
     @Builder.Default

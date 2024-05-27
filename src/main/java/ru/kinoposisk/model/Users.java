@@ -20,6 +20,7 @@ import java.util.List;
 @Builder
 @Table(name = "users", schema = "kinopoisk_dev_service")
 public class    Users {
+
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userSequence_GEN")
     @SequenceGenerator(name = "userSequence_GEN"    , sequenceName = "userSequence_SEQ", allocationSize = 1)
@@ -54,5 +55,10 @@ public class    Users {
     @Fetch(FetchMode.SELECT)
     @Builder.Default
     private List<QuizAnswers> quizAnswers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SELECT)
+    @Builder.Default
+    private List<MovieHistory> movieHistoriesList = new ArrayList<>();
 }
 

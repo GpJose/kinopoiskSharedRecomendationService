@@ -62,8 +62,8 @@ public class AdminServiceImpl implements AdminService {
         Users user = usersService.findByLogin(login);
 
         return user.isActive() ?
-                usersRepository.changeActiveStatus(user.getLogin(), false) :
-                usersRepository.changeActiveStatus(user.getLogin(), true);
+                usersService.changeActiveStatus(user.getLogin(), false) :
+                usersService.changeActiveStatus(user.getLogin(), true) ;
     }
 
     @Override

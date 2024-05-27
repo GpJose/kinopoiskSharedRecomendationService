@@ -1,7 +1,6 @@
 package ru.kinoposisk.utils;
 
 import ru.kinoposisk.model.enums.CountryEnums;
-import ru.kinoposisk.model.enums.GenreEnums;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;

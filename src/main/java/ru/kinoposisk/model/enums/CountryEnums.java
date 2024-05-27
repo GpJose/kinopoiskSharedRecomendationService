@@ -1,7 +1,6 @@
 package ru.kinoposisk.model.enums;
 
 import lombok.Getter;
-import lombok.ToString;
 
 @Getter
 public enum CountryEnums {
