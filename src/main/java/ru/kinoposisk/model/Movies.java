@@ -58,5 +58,6 @@ public class Movies {
 
     @OneToMany(mappedBy = "movie",fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = true)
     @Fetch(FetchMode.SELECT)
+    @Builder.Default
     private List<MovieHistory> movieHistory = new java.util.ArrayList<>();
 }

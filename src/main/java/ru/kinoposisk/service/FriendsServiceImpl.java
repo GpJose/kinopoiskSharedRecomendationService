@@ -68,7 +68,7 @@ public class FriendsServiceImpl implements FriendsService {
     @Override
     public List<Friends> getAllFriendsRequestByUser(Users user) {
 
-        return friendsRepository.findByUserIdAndUserId_Friends_FriendRequestStatusOrderByUserId_Friends_DateDesc(user, FriendsRequestStatusEnum.PENDING);
+        return friendsRepository.findByUserIdAndRequestStatusAllFriendList(user.getId(), FriendsRequestStatusEnum.PENDING);
     }
 
 
@@ -101,14 +101,9 @@ public class FriendsServiceImpl implements FriendsService {
 
 
     private Friends getFriendRequest(Users user, Users friend) {
-        Optional<Friends> friendRequestStatus = friendsRepository.findByUserIdAndFriendId(user, friend);
 
-        if (!friendRequestStatus.isPresent()) {
-
-            throw new UsernameNotFoundException("Friend request not exist");
-        }
-
-        return friendRequestStatus.get();
+        return friendsRepository.findByUserIdAndFriendId(user, friend)
+                .orElseThrow(() -> new UsernameNotFoundException("Friend request not exist"));
     }
 
     @Override

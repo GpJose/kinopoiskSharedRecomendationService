@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-class Rating {
+public class Rating {
     @JsonProperty("kp")
     private double kpRating;
     @JsonProperty("imdb")

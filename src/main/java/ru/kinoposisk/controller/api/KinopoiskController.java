@@ -1,4 +1,4 @@
-package ru.kinoposisk.controller;
+package ru.kinoposisk.controller.api;
 
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +12,16 @@ import ru.kinoposisk.dto.quiz.QuizDTO;
 import ru.kinoposisk.model.Friends;
 import ru.kinoposisk.model.QuizAnswers;
 import ru.kinoposisk.model.enums.FriendsRequestStatusEnum;
-import ru.kinoposisk.service.interfaces.*;
+import ru.kinoposisk.service.interfaces.FriendsService;
+import ru.kinoposisk.service.interfaces.KinopoiskAPIService;
+import ru.kinoposisk.service.interfaces.QuizUsersAnswersService;
+import ru.kinoposisk.service.interfaces.UsersService;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "kinopoisk/profile/")
+@RequestMapping(path = "/api/kinopoisk/")
 @Validated
 public class KinopoiskController {
 
@@ -51,8 +54,11 @@ public class KinopoiskController {
     public ResponseEntity<String> sendRequest(@Valid @RequestBody Authentication authentication) {
 
         kinopoiskAPIService.sendRequest(usersService.findByLogin(authentication.getName()));
+
         return ResponseEntity.ok().body("Success");
     }
+
+    // TODO совместное просмотр фильтма
 
     // Получение всех ответов на вопросы
     @GetMapping(path = "quiz")

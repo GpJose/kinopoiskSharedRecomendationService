@@ -1,7 +1,9 @@
 package ru.kinoposisk.dto.auth;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
@@ -10,6 +12,8 @@ import javax.validation.constraints.Size;
 
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class AuthSignUpDTO {
 
     @NotEmpty(message = "Login is required")

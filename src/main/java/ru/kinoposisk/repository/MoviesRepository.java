@@ -17,4 +17,6 @@ public interface MoviesRepository extends JpaRepository<Movies, Long> {
     double getAverageRatingForMovie(@Param("movieId") Long movieId);
     List<Movies> findByGenresContains(String genres);
 
+    @Query(value = "SELECT m.kinopoisk_id from kinopoisk_dev_service.movies m", nativeQuery = true)
+    List<Long> findAllKpIds();
 }

@@ -1,4 +1,4 @@
-package ru.kinoposisk.controller;
+package ru.kinoposisk.controller.api;
 
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
@@ -25,7 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping(path ="/user/auth/")
+@RequestMapping(path ="/api/user/auth/")
 @Validated
 @Log4j2
 public class AuthController {

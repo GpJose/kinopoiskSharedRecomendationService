@@ -2,10 +2,7 @@ package ru.kinoposisk.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -14,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public
-class Movie {
+@Getter
+public class Movie {
 
     private Rating rating;
     @JsonProperty("movieLength")
@@ -33,4 +30,10 @@ class Movie {
     private String englishName;
     private Logo logo;
 
+    public double getKpRating() {
+        return this.rating.getKpRating();
+    }
+    public double getImdbRating() {
+     return this.rating.getImdbRating();
+    }
 }

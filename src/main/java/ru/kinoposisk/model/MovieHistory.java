@@ -24,12 +24,12 @@ public class MovieHistory {
     @Column(name = "id", nullable = false)
     private Long id;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "user_id", updatable = false, referencedColumnName = "id")
     @Fetch(FetchMode.SELECT)
     private Users user;
 
-    @ManyToOne(cascade = {CascadeType.REFRESH})
+    @ManyToOne
     @JoinColumn(name = "movie_id", updatable = false)
     @Fetch(FetchMode.SELECT)
     private Movies movie;

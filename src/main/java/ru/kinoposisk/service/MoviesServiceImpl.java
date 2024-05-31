@@ -1,17 +1,18 @@
 package ru.kinoposisk.service;
 
-import org.springframework.dao.DuplicateKeyException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-import ru.kinoposisk.dto.response.Movie;
-import ru.kinoposisk.dto.response.MovieResultResponseDTO;
 import ru.kinoposisk.exception.moviesExceptions.MovieNotFoundByIdException;
 import ru.kinoposisk.model.Movies;
 import ru.kinoposisk.repository.MoviesRepository;
 import ru.kinoposisk.service.interfaces.MoviesService;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
+@Log4j2
 public class MoviesServiceImpl implements MoviesService {
 
     private final MoviesRepository moviesRepository;
@@ -23,12 +24,13 @@ public class MoviesServiceImpl implements MoviesService {
     @Override
     public Movies add(Movies movies) {
 
-        if (checkMovieIsExist(movies)) {
-            return moviesRepository.save(movies);
-        }
-        else {
-            throw new DuplicateKeyException("Movie with id: " + movies.getKinopoiskId() + " already exist");
-        }
+//        if (checkMovieIsExist(movies)) {
+//            return moviesRepository.save(movies);
+//        }
+//        else {
+//            throw new DuplicateKeyException("Movie with id: " + movies.getKinopoiskId() + " already exist");
+//        }
+        return moviesRepository.save(movies);
     }
 
     @Override
@@ -80,18 +82,41 @@ public class MoviesServiceImpl implements MoviesService {
 
         return moviesRepository.findById(id).orElseThrow(() -> new MovieNotFoundByIdException(id));
     }
-    public void movieBuilder(MovieResultResponseDTO movieResultResponseDTO) {
-        // TODO movieResponseBuilder
-        for (Movie movie : movieResultResponseDTO.getMovies()) {
-            if (checkMovieIsExist(movie.getId())) {
 
+    @Override
+    public List<Long> findAllKpIds() {
+
+        return moviesRepository.findAllKpIds();
+    }
+
+    @Override
+    public void saveAllNewMovies(List<Movies> movies) {
+
+        List<Long> movieIdsFromDatabase = findAllKpIds();
+        List<Movies> filteredMovieList = new ArrayList<>();
+
+        for (Movies movie : movies) {
+            if (!movieIdsFromDatabase.contains(movie.getId())) {
+                filteredMovieList.add(movie);
             }
-
         }
+
+        moviesRepository.saveAll(filteredMovieList);
+        log.info(">>>Added new movies: " + Arrays.toString(filteredMovieList.toArray()));
     }
 
-    private boolean checkMovieIsExist(Movies movies) {
-
-        return checkMovieIsExist(movies.getKinopoiskId());
-    }
+//    public void movieBuilder(MovieResultResponseDTO movieResultResponseDTO) {
+//        // TODO movieResponseBuilder
+//        for (Movie movie : movieResultResponseDTO.getMovies()) {
+//            if (checkMovieIsExist(movie.getId())) {
+//
+//            }
+//
+//        }
+//    }
+//
+//    private boolean checkMovieIsExist(Movies movies) {
+//
+//        return checkMovieIsExist(movies.getKinopoiskId());
+//    }
 }

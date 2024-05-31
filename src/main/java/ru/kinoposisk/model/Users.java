@@ -50,11 +50,16 @@ public class    Users {
     @Builder.Default
     private List<Friends> friends = new java.util.ArrayList<>();
 
-    @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("users, date  desc")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "friendId", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(FetchMode.SELECT)
     @Builder.Default
-    private List<QuizAnswers> quizAnswers = new ArrayList<>();
+    private List<Friends> friendsId = new java.util.ArrayList<>();
+
+    @ToString.Exclude
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "quiz_answers_id")
+    @Fetch(FetchMode.SELECT)
+    private QuizAnswers quizAnswers;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @Fetch(FetchMode.SELECT)

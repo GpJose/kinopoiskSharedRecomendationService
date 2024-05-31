@@ -26,8 +26,8 @@ public class QuizAnswers {
     @SequenceGenerator(name = "quiz_sequence", sequenceName = "quiz_sequence", allocationSize = 1)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH, optional = false)
-    @JoinColumn(name = "user_id", nullable = false)
+    @OneToOne(mappedBy = "quizAnswers", optional = false, orphanRemoval = true)
+    @JoinColumn(name = "user_id")
     @Fetch(FetchMode.SELECT)
     private Users users;
 

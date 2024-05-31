@@ -10,14 +10,19 @@ import ru.kinoposisk.model.Movies;
 import ru.kinoposisk.model.Users;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MovieHistoryRepository extends JpaRepository<MovieHistory, Long> {
-    List<MovieHistory> findByUserId(Long id);
 
-    List<MovieHistory> findByUser(Users user);
+    @Query(value = "select * from kinopoisk_dev_service.movie_history m where m.user_id =?1", nativeQuery = true)
+    Optional<List<MovieHistory>> findByUser(Long id);
 
-    List<MovieHistory> findByUser_LoginAndMovie_LocalRatingNotNull(String login);
+//    List<MovieHistory> findByUser_LoginAndMovie_LocalRatingNotNull(Users login);
+
+    List<MovieHistory> findByUser_Login(String login);
+
+
 
     @Transactional
     @Modifying

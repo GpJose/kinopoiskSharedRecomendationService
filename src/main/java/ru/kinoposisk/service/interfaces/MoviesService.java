@@ -11,4 +11,8 @@ public interface MoviesService extends BaseService<Movies> {
     Movies findByCountry(String country);
 
     Movies getMovieById(Long id);
+
+    List<Long> findAllKpIds();
+
+    void saveAllNewMovies(List<Movies> movies);
 }

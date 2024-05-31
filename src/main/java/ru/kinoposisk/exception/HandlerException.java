@@ -5,6 +5,7 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -36,7 +37,7 @@ public class HandlerException {
 
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    @ExceptionHandler({UsernameNotFoundException.class})
+    @ExceptionHandler({FriendsAccessDenyException.class})
     public ResponseEntity<String> handleValidationExceptions(FriendsAccessDenyException ex) {
 
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.FORBIDDEN);
@@ -46,6 +47,13 @@ public class HandlerException {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({UsernameNotFoundException.class})
     public ResponseEntity<String> handleValidationExceptions(UsernameNotFoundException ex) {
+
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({BindException.class})
+    public ResponseEntity<String> handleValidationExceptions(BindException ex) {
 
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }

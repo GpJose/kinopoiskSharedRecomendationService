@@ -1,6 +1,7 @@
 package ru.kinoposisk.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import ru.kinoposisk.model.MovieHistory;
 import ru.kinoposisk.model.Movies;
@@ -37,13 +38,14 @@ public class MoveHistoryImpl implements MovieHistoryService {
     @Override
     public List<MovieHistory> findByUser(Users user) {
 
-        return movieHistoryRepository.findByUser(user);
+        return movieHistoryRepository.findByUser(user.getId())
+                .orElseThrow(() -> new UsernameNotFoundException("User do not watch any movies"));
     }
 
     @Override
     public List<MovieHistory> getAllMoviesWithRatingByUser(String login) {
 
-        return movieHistoryRepository.findByUser_LoginAndMovie_LocalRatingNotNull(usersService.findByLogin(login).getLogin());
+        return movieHistoryRepository.findByUser_Login(usersService.findByLogin(login).getLogin());
     }
 
     @Override

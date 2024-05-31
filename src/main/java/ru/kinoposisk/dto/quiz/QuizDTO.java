@@ -14,7 +14,7 @@ import javax.validation.constraints.Pattern;
 public class QuizDTO {
 
     @NotEmpty(message = "Genre is required")
-    @EnumValue(enumClass = GenreEnums.class, message = "Invalid genre")
+    @EnumValue(enumClass = GenreEnums.class)
     private GenreEnums[] genre;
 
     @NotEmpty(message = "Duration is required")
@@ -22,6 +22,6 @@ public class QuizDTO {
     private String duration;
 
     @NotEmpty(message = "Country is required")
-    @EnumValue(enumClass = CountryEnums.class, message = "Invalid country")
+    @EnumValue(enumClass = CountryEnums.class)
     private CountryEnums[] country;
 }

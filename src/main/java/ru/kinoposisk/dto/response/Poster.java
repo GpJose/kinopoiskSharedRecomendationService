@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-class Poster {
+public class Poster {
     private String url;
     @JsonProperty("previewUrl")
     private String previewURL;

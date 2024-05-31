@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface MovieHistoryService  extends BaseService<MovieHistory> {
 
-//    List<MovieHistory> findByUser(Users user);
+    List<MovieHistory> findByUser(Users user);
 
     List<MovieHistory> getAllMoviesWithRatingByUser(String login);
 
