@@ -243,8 +243,8 @@ public enum CountryEnums {
     Ямайка,
     Япония;
 
-    @Override
-    public String toString() {
-        return this.name().replaceAll("_", " ");
-    }
+//    @Override
+//    public String toString() {
+//        return this.name().replaceAll("_", " ");
+//    }
 }

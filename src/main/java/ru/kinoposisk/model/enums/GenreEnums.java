@@ -37,8 +37,8 @@ public enum GenreEnums {
     ФЭНТЕЗИ,
     ЦЕРЕМОНИЯ;
 
-    @Override
-    public String toString() {
-        return this.name().replaceAll("_", " ");
-    }
+//    @Override
+//    public String toString() {
+//        return this.name().replaceAll("_", " ");
+//    }
 }

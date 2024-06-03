@@ -91,6 +91,30 @@ public class KinopoiskController {
         return ResponseEntity.ok().body("Success");
     }
 
+    // Просмотр статуса заявки в друзья
+    @GetMapping(path = "friends/{friendLogin}/status")
+    public ResponseEntity<FriendsRequestStatusEnum> getFriendStatus(Authentication authentication, @PathVariable String friendLogin) {
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(
+                        friendsService.findFriendRequestStatus(
+                                usersService.findByLogin(authentication.getName()),
+                                usersService.findByLogin(friendLogin)
+                        ));
+    }
+
+    // Отправка запроса в друзья
+    @PostMapping(path = "friends/{friendLogin}/sendFriendRequest")
+    public ResponseEntity<String> sendFriendRequest(Authentication authentication, @PathVariable String friendLogin) {
+
+        friendsService.sendFriendRequest(
+                usersService.findByLogin(authentication.getName()),
+                usersService.findByLogin(friendLogin));
+
+        return  ResponseEntity.status(HttpStatus.CREATED).body("Success");
+    }
+
     // Получение профиля друга
     @SneakyThrows
     @GetMapping(path = "friends/{friendLogin}")
@@ -109,32 +133,6 @@ public class KinopoiskController {
                 usersService.findByLogin(friendLogin));
 
         return ResponseEntity.status(HttpStatus.OK).body("Has been deleted");
-    }
-
-
-    // Отправка запроса в друзья
-    @PostMapping(path = "friends/{friendLogin}/sendFriendRequest")
-    public ResponseEntity<String> sendFriendRequest(Authentication authentication, @PathVariable String friendLogin) {
-
-        friendsService.sendFriendRequest(
-                usersService.findByLogin(authentication.getName()),
-                usersService.findByLogin(friendLogin));
-
-        return  ResponseEntity.status(HttpStatus.CREATED).body("Success");
-    }
-
-
-    // Просмотр статуса заявки в друзья
-    @GetMapping(path = "friends/{friendLogin}/status")
-    public ResponseEntity<FriendsRequestStatusEnum> getFriendStatus(Authentication authentication, @PathVariable String friendLogin) {
-
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(
-                        friendsService.findFriendRequestStatus(
-                                usersService.findByLogin(authentication.getName()),
-                                usersService.findByLogin(friendLogin)
-                        ));
     }
 
 

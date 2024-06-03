@@ -83,6 +83,7 @@ public class HandlerException {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleValidationExceptions(Exception ex) {
         ex.printStackTrace();
+
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 

@@ -168,12 +168,12 @@ public class UsersServiceImpl implements UsersService {
     }
 
     private boolean isLoginUnique(String login) {
-        
+
         return !usersRepository.findByLogin(login).isPresent();
     }
 
     private boolean isLoginAndEmailUnique(String login, String email) {
-        
+
         return isLoginUnique(login) && isEmailUnique(email);
     }
 
@@ -193,17 +193,19 @@ public class UsersServiceImpl implements UsersService {
         }).collect(Collectors.toList());
         userProfileDTO.setFriends(friends);
 
-        List<MovieHistoryDTO> movieHistories = user.getMovieHistoriesList().stream().map(history -> {
-            MovieHistoryDTO movieHistoryDTO = new MovieHistoryDTO();
-            movieHistoryDTO.setMovieId(history.getMovie().getId());
-            movieHistoryDTO.setMovieName(history.getMovie().getName());
-            movieHistoryDTO.setPosterUrl(history.getMovie().getUrl());
-            movieHistoryDTO.setWatchedDate(history.getWatchedDate());
-            movieHistoryDTO.setRating(history.getRating());
+        List<MovieHistoryDTO> movieHistories = user.getMovieHistoriesList()
+                .stream()
+                .map(history -> {
+                    MovieHistoryDTO movieHistoryDTO = new MovieHistoryDTO();
+                    movieHistoryDTO.setMovieId(history.getMovie().getId());
+                    movieHistoryDTO.setMovieName(history.getMovie().getName());
+                    movieHistoryDTO.setPosterUrl(history.getMovie().getUrl());
+                    movieHistoryDTO.setWatchedDate(history.getWatchedDate());
+                    movieHistoryDTO.setRating(history.getRating());
 
-            return movieHistoryDTO;
+                    return movieHistoryDTO;
 
-        }).collect(Collectors.toList());
+                }).collect(Collectors.toList());
         userProfileDTO.setMovieHistories(movieHistories);
 
         return userProfileDTO;
