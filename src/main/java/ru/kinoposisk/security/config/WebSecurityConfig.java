@@ -19,8 +19,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Log4j2
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final UserDetailsService userDetailsService;
+
     @Autowired
-    private UserDetailsService userDetailsService;
+    public WebSecurityConfig(UserDetailsService userDetailsService) {
+        this.userDetailsService = userDetailsService;
+    }
 
     @Bean
     @Override
@@ -37,14 +41,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/user/auth/signup").permitAll()
                 .antMatchers("/api/user/auth/login").permitAll()
                 .antMatchers("/api/admin/**").hasAuthority("ADMIN")
-                .antMatchers("/api/kinopoisk/**").authenticated()
-                .antMatchers("/quiz").authenticated()
-                .antMatchers("/**").permitAll()
+                .antMatchers("/signup").permitAll()
+//                .antMatchers("/api/kinopoisk/**").authenticated()
+//                .antMatchers("/quiz").authenticated()
+                .antMatchers("/**").authenticated()
+                .antMatchers("/index").permitAll()
                 .anyRequest().permitAll()
                 .and()
                 .formLogin()
                 .loginPage("/login")
-                .defaultSuccessUrl("/kinopoisk/profile")
+                .defaultSuccessUrl("/profile")
                 .loginProcessingUrl("/user/auth/signup")
                 .usernameParameter("login")
                 .passwordParameter("password")

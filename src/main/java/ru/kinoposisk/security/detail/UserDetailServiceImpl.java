@@ -5,9 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import ru.kinoposisk.model.Users;
+import ru.kinoposisk.model.enums.RoleEnums;
 import ru.kinoposisk.repository.UsersRepository;
+
+import java.util.List;
 
 @Service
 @Log4j2

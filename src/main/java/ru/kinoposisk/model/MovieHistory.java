@@ -25,12 +25,10 @@ public class MovieHistory {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", updatable = false, referencedColumnName = "id")
     @Fetch(FetchMode.SELECT)
     private Users user;
 
     @ManyToOne
-    @JoinColumn(name = "movie_id", updatable = false)
     @Fetch(FetchMode.SELECT)
     private Movies movie;
 
@@ -38,5 +36,5 @@ public class MovieHistory {
     private Date watchedDate;
 
     @Column(name = "rating",columnDefinition = "smallint")
-    private Integer rating;
+    private Short rating;
 }

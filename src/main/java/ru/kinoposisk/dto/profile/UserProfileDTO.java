@@ -9,6 +9,7 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class UserProfileDTO {
 
     private String login;

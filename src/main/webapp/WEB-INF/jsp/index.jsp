@@ -13,9 +13,9 @@
     <jsp:include page="/login"/>
 </sec:authorize>
 
-<sec:authorize access="isAuthenticated() and hasRole('ROLE_USER')">
+<sec:authorize access="hasRole('ROLE_USER')">
 
-    <sec:authorize access="isAuthenticated() and hasRole('ROLE_ADMIN')">
+        <sec:authorize access="hasRole('ROLE_ADMIN')">
         <jsp:include page="/admin"/>
     </sec:authorize>
 </sec:authorize>

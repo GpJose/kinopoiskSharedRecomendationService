@@ -13,12 +13,16 @@ import ru.kinoposisk.dto.profile.FriendProfileDTO;
 import ru.kinoposisk.dto.profile.MovieHistoryDTO;
 import ru.kinoposisk.dto.profile.UserProfileDTO;
 import ru.kinoposisk.model.Users;
+import ru.kinoposisk.model.enums.RoleEnums;
 import ru.kinoposisk.repository.UsersRepository;
 import ru.kinoposisk.service.interfaces.UsersService;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static ru.kinoposisk.model.enums.RoleEnums.*;
 
 @Service
 @Log4j2
@@ -48,7 +52,12 @@ public class UsersServiceImpl implements UsersService {
 
         if (isLoginAndEmailUnique(users.getLogin(), users.getEmail())) {
 
-            log.info("User with login:${} and email:${} has benn created successfully", users.getLogin(), users.getEmail());
+            if(users.getLogin().equals("Admin")){
+                log.info(">>Is Admin");
+                users.setRoles(List.of(new RoleEnums[]{ROLE_USER, ROLE_ADMIN}));
+                log.info(">>Admin roles: " + users.getRoles());
+            }
+            log.info("User with login:{} and email:{} has benn created successfully", users.getLogin(), users.getEmail());
             return usersRepository.save(users);
         }
         else {
@@ -201,7 +210,7 @@ public class UsersServiceImpl implements UsersService {
                     movieHistoryDTO.setMovieName(history.getMovie().getName());
                     movieHistoryDTO.setPosterUrl(history.getMovie().getUrl());
                     movieHistoryDTO.setWatchedDate(history.getWatchedDate());
-                    movieHistoryDTO.setRating(history.getRating());
+                    movieHistoryDTO.setRating(Integer.valueOf(history.getRating()));
 
                     return movieHistoryDTO;
 

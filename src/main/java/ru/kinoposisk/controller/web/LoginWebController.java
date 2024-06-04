@@ -3,6 +3,7 @@ package ru.kinoposisk.controller.web;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,6 +46,10 @@ public class LoginWebController {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authLoginDTO.getLogin(), authLoginDTO.getPassword()));
             SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+        catch (LockedException e) {
+            model.addAttribute("userBlocked", e.getMessage());
+            return "login";
         }
         catch (Exception e) {
 

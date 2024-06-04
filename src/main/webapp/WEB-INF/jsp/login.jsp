@@ -1,4 +1,5 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,10 +14,16 @@
     <h2>Login</h2>
     <%--@elvariable id="authLoginDTO" type="ru.kinoposisk.dto.auth.AuthLoginDTO"--%>
     <form:form modelAttribute="authLoginDTO" method="post" action="login">
+
         <div class="form-group">
             <form:label path="login">Login:</form:label>
             <form:input path="login" class="form-control" placeholder="Enter your login"/>
             <form:errors path="login" cssClass="text-danger"/>
+            <c:if test="${not empty userBlocked}">
+                <div class="badge-danger">
+                        ${userBlocked}
+                </div>
+            </c:if>
         </div>
         <div class="form-group">
             <form:label path="password">Password:</form:label>
