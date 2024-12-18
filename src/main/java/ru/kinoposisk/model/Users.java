@@ -7,19 +7,17 @@ import ru.kinoposisk.model.enums.RoleEnums;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 
 @Entity
 @Getter
 @Setter
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Table(name = "users", schema = "kinopoisk_dev_service")
-public class    Users {
+public class Users {
 
     @ToString.Include
     @Id
@@ -64,11 +62,16 @@ public class    Users {
     @Builder.Default
     private List<Friends> friendsId = new ArrayList<>();
 
-    @ToString.Include
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "quiz_answers_id")
-    @Fetch(FetchMode.SELECT)
+//    @ToString.Include
+//    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    @JoinColumn(name = "quiz_answers_id")
+//    @Fetch(FetchMode.SELECT)
+//    private QuizAnswers quizAnswers;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "quiz_answers_id",referencedColumnName = "id")
     private QuizAnswers quizAnswers;
+
 
     @ToString.Include
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

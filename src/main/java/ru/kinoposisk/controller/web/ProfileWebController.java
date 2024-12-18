@@ -8,8 +8,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import ru.kinoposisk.dto.profile.UsersDTO;
 import ru.kinoposisk.forms.FriendLoginForm;
-import ru.kinoposisk.dto.profile.UserProfileDTO;
 import ru.kinoposisk.service.interfaces.FriendsService;
 import ru.kinoposisk.service.interfaces.UsersService;
 
@@ -27,9 +27,9 @@ public class ProfileWebController {
     @GetMapping("/profile")
     public String showProfileForm(Authentication authentication, Model model) {
 
-        UserProfileDTO userProfileDTO = usersService.getProfile(usersService.findByLogin(authentication.getName()));
-        model.addAttribute("listFriends", userProfileDTO.getFriends());
-        model.addAttribute("listMovieHistory", userProfileDTO.getMovieHistories());
+        UsersDTO usersDTO = usersService.getProfile(usersService.findByLogin(authentication.getName()));
+        model.addAttribute("listFriends", usersDTO.getFriends());
+        model.addAttribute("listMovieHistory", usersDTO.getMovieHistories());
         model.addAttribute("friendLoginForm", new FriendLoginForm());
 
         return "profile";

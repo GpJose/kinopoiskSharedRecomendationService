@@ -4,7 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.kinoposisk.dto.profile.UserProfileDTO;
+import ru.kinoposisk.dto.profile.UsersDTO;
 import ru.kinoposisk.exception.friendsExceptions.FriendsAccessDenyException;
 import ru.kinoposisk.model.Friends;
 import ru.kinoposisk.model.Users;
@@ -107,7 +107,7 @@ public class FriendsServiceImpl implements FriendsService {
     }
 
     @Override
-    public UserProfileDTO getFriendProfile(Users user, Users friend) throws FriendsAccessDenyException {
+    public UsersDTO getFriendProfile(Users user, Users friend) throws FriendsAccessDenyException {
 
         if(getFriendRequest(user,friend).getFriendRequestStatus() == FriendsRequestStatusEnum.ACCEPTED) {
 

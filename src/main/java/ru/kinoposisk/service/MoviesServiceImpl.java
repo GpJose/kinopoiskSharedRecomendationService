@@ -1,6 +1,7 @@
 package ru.kinoposisk.service;
 
 import lombok.extern.log4j.Log4j2;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import ru.kinoposisk.exception.moviesExceptions.MovieNotFoundByIdException;
 import ru.kinoposisk.model.Movies;
@@ -15,7 +16,7 @@ import java.util.List;
 @Log4j2
 public class MoviesServiceImpl implements MoviesService {
 
-    private final MoviesRepository moviesRepository;
+    private final MoviesRepository  moviesRepository;
 
     public MoviesServiceImpl(MoviesRepository moviesRepository) {
         this.moviesRepository = moviesRepository;
@@ -24,13 +25,12 @@ public class MoviesServiceImpl implements MoviesService {
     @Override
     public Movies add(Movies movies) {
 
-//        if (checkMovieIsExist(movies)) {
-//            return moviesRepository.save(movies);
-//        }
-//        else {
-//            throw new DuplicateKeyException("Movie with id: " + movies.getKinopoiskId() + " already exist");
-//        }
-        return moviesRepository.save(movies);
+        if (!checkMovieIsExist(movies)) {
+            return moviesRepository.save(movies);
+        }
+        else {
+            throw new DuplicateKeyException("Movie with id: " + movies.getKinopoiskId() + " already exist");
+        }
     }
 
     @Override
@@ -101,6 +101,8 @@ public class MoviesServiceImpl implements MoviesService {
             }
         }
 
+        log.info("Move size : {} ", movies.size());
+        log.info("Movie values : {}", Arrays.toString(new List[]{movies}));
         moviesRepository.saveAll(filteredMovieList);
         log.info(">>>Added new movies: " + Arrays.toString(filteredMovieList.toArray()));
     }
@@ -108,15 +110,15 @@ public class MoviesServiceImpl implements MoviesService {
 //    public void movieBuilder(MovieResultResponseDTO movieResultResponseDTO) {
 //        // TODO movieResponseBuilder
 //        for (Movie movie : movieResultResponseDTO.getMovies()) {
-//            if (checkMovieIsExist(movie.getId())) {
+//            if (checkMovieIsExist(movie)) {
 //
 //            }
 //
 //        }
 //    }
-//
-//    private boolean checkMovieIsExist(Movies movies) {
-//
-//        return checkMovieIsExist(movies.getKinopoiskId());
-//    }
+
+    private boolean checkMovieIsExist(Movies movies) {
+
+        return moviesRepository.findById(movies.getId()).isPresent();
+    }
 }

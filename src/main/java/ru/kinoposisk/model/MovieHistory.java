@@ -15,7 +15,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "MovieHistory", schema = "kinopoisk_dev_service")
+@Table(name = "movie_history", schema = "kinopoisk_dev_service")
 public class MovieHistory {
 
     @Id

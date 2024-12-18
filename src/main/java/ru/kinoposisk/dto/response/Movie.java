@@ -22,6 +22,7 @@ public class Movie {
     private String name;
     private String description;
     private Integer year;
+    @JsonProperty("poster")
     private Poster poster;
     private List<Genre> genres;
     private List<Country> countries;

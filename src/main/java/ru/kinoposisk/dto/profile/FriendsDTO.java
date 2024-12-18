@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class FriendProfileDTO {
+public class FriendsDTO {
 
     private String friendLogin;
 }

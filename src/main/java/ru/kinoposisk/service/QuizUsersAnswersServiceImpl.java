@@ -4,13 +4,14 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.kinoposisk.dto.quiz.QuizDTO;
+import ru.kinoposisk.dto.quiz.QuizAnswersDTO;
 import ru.kinoposisk.model.QuizAnswers;
 import ru.kinoposisk.repository.QuizRepository;
 import ru.kinoposisk.repository.UsersRepository;
 import ru.kinoposisk.service.interfaces.QuizUsersAnswersService;
 import ru.kinoposisk.service.interfaces.UsersService;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -62,13 +63,13 @@ public class QuizUsersAnswersServiceImpl implements QuizUsersAnswersService {
     }
 
     @Override
-    public QuizAnswers build(QuizDTO quizDTO, String login) {
+    public QuizAnswers build(QuizAnswersDTO quizAnswersDTO, String login) {
 
         return  QuizAnswers.builder()
                 .users(usersService.findByLogin(login))
-                .duration(quizDTO.getDuration())
-                .genre(quizDTO.getGenre())
-                .country(quizDTO.getCountry())
+                .duration(quizAnswersDTO.getDuration())
+                .genre(Arrays.asList(quizAnswersDTO.getGenre()))
+                .country(Arrays.asList(quizAnswersDTO.getCountry()))
                 .build();
     }
 }

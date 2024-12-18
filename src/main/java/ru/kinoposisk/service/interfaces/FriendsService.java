@@ -1,6 +1,6 @@
 package ru.kinoposisk.service.interfaces;
 
-import ru.kinoposisk.dto.profile.UserProfileDTO;
+import ru.kinoposisk.dto.profile.UsersDTO;
 import ru.kinoposisk.exception.friendsExceptions.FriendsAccessDenyException;
 import ru.kinoposisk.model.Friends;
 import ru.kinoposisk.model.Users;
@@ -22,6 +22,6 @@ public interface FriendsService  {
 
     FriendsRequestStatusEnum findFriendRequestStatus(Users user, Users friend);
 
-    UserProfileDTO getFriendProfile(Users user, Users friend) throws FriendsAccessDenyException;
+    UsersDTO getFriendProfile(Users user, Users friend) throws FriendsAccessDenyException;
 
 }

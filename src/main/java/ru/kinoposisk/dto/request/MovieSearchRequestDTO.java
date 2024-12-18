@@ -5,8 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.kinoposisk.model.enums.CountryEnums;
-import ru.kinoposisk.model.enums.GenreEnums;
+import ru.kinoposisk.model.CountryReference;
+import ru.kinoposisk.model.GenreReference;
 
 import java.util.List;
 
@@ -27,9 +27,9 @@ public class MovieSearchRequestDTO {
     @JsonProperty("movieLength")
     private String movieLength;
     @JsonProperty("genres.name")
-    private List<GenreEnums> genres;
+    private List<GenreReference> genres;
     @JsonProperty("countries.name")
-    private List<CountryEnums> countries;
+    private List<CountryReference> countries;
 }
 
 

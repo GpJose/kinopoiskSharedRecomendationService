@@ -1,15 +1,15 @@
 package ru.kinoposisk.model;
 
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import ru.kinoposisk.model.enums.FriendsRequestStatusEnum;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Data
+@Getter
+@Setter
+@RequiredArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(onlyExplicitlyIncluded = true)
@@ -44,5 +44,4 @@ public class Friends {
     @Column(name = "friend_request_status")
     @Enumerated(EnumType.STRING)
     private FriendsRequestStatusEnum friendRequestStatus;
-
 }

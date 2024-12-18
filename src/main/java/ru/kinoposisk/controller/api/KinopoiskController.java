@@ -7,8 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.kinoposisk.dto.profile.UserProfileDTO;
-import ru.kinoposisk.dto.quiz.QuizDTO;
+import ru.kinoposisk.dto.profile.UsersDTO;
+import ru.kinoposisk.dto.quiz.QuizAnswersDTO;
 import ru.kinoposisk.model.Friends;
 import ru.kinoposisk.model.QuizAnswers;
 import ru.kinoposisk.model.enums.FriendsRequestStatusEnum;
@@ -44,7 +44,7 @@ public class KinopoiskController {
 
     // Профиль пользователя
     @GetMapping(path = "profile")
-    public ResponseEntity<UserProfileDTO> getProfile(Authentication authentication) {
+    public ResponseEntity<UsersDTO> getProfile(Authentication authentication) {
 
         return ResponseEntity.ok().body(usersService.getProfile(usersService.findByLogin(authentication.getName())));
     }
@@ -69,9 +69,9 @@ public class KinopoiskController {
 
     // Отправка ответов на вопросы
     @PostMapping(path = "quiz")
-    public ResponseEntity<String> setQuiz(@Valid @RequestBody QuizDTO quizDTO, Authentication authentication) {
+    public ResponseEntity<String> setQuiz(@Valid @RequestBody QuizAnswersDTO quizAnswersDTO, Authentication authentication) {
 
-        quizUsersAnswersService.add(quizUsersAnswersService.build(quizDTO, authentication.getName()));
+        quizUsersAnswersService.add(quizUsersAnswersService.build(quizAnswersDTO, authentication.getName()));
 
         return ResponseEntity.status(HttpStatus.CREATED).body("Success");
     }
@@ -118,7 +118,7 @@ public class KinopoiskController {
     // Получение профиля друга
     @SneakyThrows
     @GetMapping(path = "friends/{friendLogin}")
-    public ResponseEntity<UserProfileDTO> getFriendProfile(Authentication authentication, @PathVariable String friendLogin) {
+    public ResponseEntity<UsersDTO> getFriendProfile(Authentication authentication, @PathVariable String friendLogin) {
 
         return ResponseEntity.status(HttpStatus.OK).body(friendsService.getFriendProfile(
                 usersService.findByLogin(authentication.getName()),

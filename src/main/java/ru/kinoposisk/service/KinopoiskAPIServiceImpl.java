@@ -10,27 +10,29 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.util.UriBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 import ru.kinoposisk.config.RetryTemplateConfig;
 import ru.kinoposisk.dto.request.MovieSearchRequestDTO;
 import ru.kinoposisk.dto.response.Country;
 import ru.kinoposisk.dto.response.Genre;
 import ru.kinoposisk.dto.response.Movie;
 import ru.kinoposisk.dto.response.MovieResultResponseDTO;
-import ru.kinoposisk.model.MovieHistory;
 import ru.kinoposisk.model.Movies;
 import ru.kinoposisk.model.Users;
-import ru.kinoposisk.model.enums.CountryEnums;
-import ru.kinoposisk.model.enums.GenreEnums;
 import ru.kinoposisk.service.interfaces.KinopoiskAPIService;
 import ru.kinoposisk.service.interfaces.MovieHistoryService;
 import ru.kinoposisk.service.interfaces.MoviesService;
 import ru.kinoposisk.service.interfaces.UsersService;
 
+import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,8 +46,7 @@ public class KinopoiskAPIServiceImpl implements KinopoiskAPIService {
     @Value("${ru.kinopoisk.url}")
     private String apiUrl;
 
-    private String url = "https://api.kinopoisk.dev/v1.4/movie?page=1&limit=1&selectFields=id&selectFields=name&selectFields=enName&selectFields=description&selectFields=year&selectFields=movieLength&selectFields=countries&selectFields=logo&selectFields=genres&selectFields=type&selectFields=rating&selectFields=poster&selectFields=persons&sortField=rating.kp&sortType=-1&type=movie&rating.kp=5-10&movieLength=100-500&genres.name=%2B%D0%B4%D1%80%D0%B0%D0%BC%D0%B0&genres.name=%2B%D0%BA%D0%BE%D0%BC%D0%B5%D0%B4%D0%B8%D1%8F&countries.name=%D0%A1%D0%A8%D0%90";
-    private final RetryTemplateConfig templateConfig;
+     private final RetryTemplateConfig templateConfig;
 
     private final MovieHistoryService movieHistoryService;
     private final UsersService usersService;
@@ -60,23 +61,24 @@ public class KinopoiskAPIServiceImpl implements KinopoiskAPIService {
     }
 
     @SneakyThrows
-    public void sendRequest(Users user) {
+    public void sendRequest(@Valid Users user) {
 
         // TODO Получение историй 10ти фильмов. Если их нет -
 
         // TODO Movie Repo replace with movie Service and error Throw if user do not have any movies
-        List<MovieHistory> userMovieHistory = movieHistoryService.findByUser(user);
+//        List<MovieHistory> userMovieHistory = movieHistoryService.findByUser(user);
 
         // TODO Refactoring in another method send with history or quizsAnswers
 
         // TODO Exception с редиректом на прохождение вопросов по фильму
         // TODO CHECK 10 OR MORE MOVIES BEFORE THIS METHOD OR NULL
         // TODO Передавать в метод MovieHistoryList
-        if (userMovieHistory.size() < 10) {
-            throw new NullPointerException("For recommendation you need to pass 10 or more movies");
-        }
+//        if (userMovieHistory.size() < 10) {
+//            throw new NullPointerException("For recommendation you need to pass 10 or more movies");
+//        }
 
 
+        log.info("SENDING REQUEST");
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-API-KEY", apiKey);
         headers.add("accept", "application/json");
@@ -84,42 +86,81 @@ public class KinopoiskAPIServiceImpl implements KinopoiskAPIService {
 
 
         MovieSearchRequestDTO requestDTO = MovieSearchRequestDTO.builder()
-                .genres(Arrays.asList(user.getQuizAnswers().getGenre()))
+                .genres(user.getQuizAnswers().getGenre())
                 .movieLength(user.getQuizAnswers().getDuration())
-                .countries(Arrays.asList(user.getQuizAnswers().getCountry()))
+                .countries(user.getQuizAnswers().getCountry())
                 .build();
 
-//        String jsonRequestString = Mapper.objectToJson(userMovieHistory);
-//        log.info(jsonRequestString);
-//        log.info(entity.toString());
+        MultiValueMap<String,String> params = new LinkedMultiValueMap<>();
 
+        params.put("movieLength", Collections.singletonList(requestDTO.getMovieLength().replaceAll("[\\[\\]]","")));
+        requestDTO.getGenres().forEach(genre -> {
+            params.add("genres.name", genre.getGenreName().replaceAll("_", " ").replaceAll("[\\[\\]]","").toLowerCase());
+        });
+        requestDTO.getCountries().forEach(country -> {
+            params.add("countries.name", country.getCountryName().replaceAll("_", " ").replaceAll("[\\[\\]]",""));
+        });
+
+        params.forEach((name, text) -> {
+            try {
+                log.info("Decoder : {} valuse : {}",name,URLDecoder.decode(String.valueOf(text),"UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        List<Movies> moviesList = new ArrayList<>();
         templateConfig.retryTemplate().execute(context -> {
-            ResponseEntity<MovieResultResponseDTO> responseEntity = templateConfig.restTemplate().exchange(URI.create(urlBuilder(requestDTO)), HttpMethod.GET, entity, MovieResultResponseDTO.class);
 
+
+            UriBuilder uriBuilder = UriComponentsBuilder.fromUriString(apiUrl).queryParams(params);
+            URI uri = uriBuilder.build();
+            log.info(">>>>URI : " + uri);
+            ResponseEntity<MovieResultResponseDTO> responseEntity = templateConfig.restTemplate().exchange
+                    (uri, HttpMethod.GET, entity, MovieResultResponseDTO.class);
+            log.info("GETTING REQUEST : ");
+
+            log.info(">>>RESPONSE : " + responseEntity);
             MovieResultResponseDTO result = responseEntity.getBody();
             log.info(">>>RESPONSE BODY: " + result.toString());
             List<Movie> movieListResponse =  result.getMovies();
+            log.info(">>>MovieCount : " + movieListResponse.size());
 
-            List<Movies> moviesList = new ArrayList<>();
             for (Movie movie : movieListResponse) {
 
-                Movies movies = Movies.builder()
-                        .kinopoiskId(movie.getId())
-                        .kpRating(movie.getKpRating())
-                        .imdbRating(movie.getImdbRating())
-                        .duration(movie.getLength())
-                        .type(movie.getType())
-                        .name(movie.getName())
-                        .description(movie.getDescription())
-                        .year(movie.getYear())
-                        .url(movie.getPoster().getUrl())
-                        .previewURL(movie.getPoster().getPreviewURL())
-                        .logoURL(movie.getLogo().getUrl())
-                        .genres(movie.getGenres().stream().map(Genre::getName).collect(Collectors.joining(", ")))
-                        .countries(movie.getCountries().stream().map(Country::getName).collect(Collectors.joining(", ")))
-                        .build();
+                try {
 
-                moviesList.add(movies);
+                    Movies movies = Movies.builder()
+                            .kinopoiskId(movie.getId())
+                            .kpRating(movie.getKpRating())
+                            .imdbRating(movie.getImdbRating())
+                            .duration(movie.getLength())
+                            .type(movie.getType())
+                            .name(movie.getName())
+                            .description(movie.getDescription())
+                            .year(movie.getYear())
+                            .genres(movie.getGenres()
+                                    .stream()
+                                    .map(Genre::getName)
+                                    .collect(Collectors.joining(", ")))
+                            .countries(movie.getCountries()
+                                    .stream()
+                                    .map(Country::getName)
+                                    .collect(Collectors.joining(", ")))
+                            .build();
+
+                    if(movie.getPoster() != null) {
+                        movies.setUrl(movie.getPoster().getUrl());
+                        movies.setPreviewURL(movie.getPoster().getPreviewURL());
+                    }
+                    if(movie.getLogo() != null) {
+                        movies.setLogoURL(movie.getLogo().getUrl());
+                    }
+                    moviesList.add(movies);
+                }
+
+                catch (NullPointerException e) {
+                    log.warn("Error parsing movie: " + movie + "\n" + e);
+                }
             }
             moviesService.saveAllNewMovies(moviesList);
 
@@ -127,25 +168,29 @@ public class KinopoiskAPIServiceImpl implements KinopoiskAPIService {
         });
     }
 
-    private String urlBuilder(MovieSearchRequestDTO requestDTO) {
-        StringBuilder urlBuilder = new StringBuilder(apiUrl);
+//    private String urlBuilder(MovieSearchRequestDTO requestDTO) {
+//        StringBuilder urlBuilder = new StringBuilder(apiUrl);
+//
+//        Map<String,String> stringMap = new HashMap<>();
+//
+//
+//        urlBuilder.append("movieLength=").append(URLEncoder.encode(requestDTO.getMovieLength(), StandardCharsets.UTF_8)).append("&");
+//
+//        List<GenreEnums> genres = requestDTO.getGenres();
+//        for (GenreEnums genre : genres) {
+//            urlBuilder.append("genres.name=").append(URLEncoder.encode(genre.toString().replaceAll("_"," "), StandardCharsets.UTF_8)).append("&");
+//        }
+//
+//        List<CountryEnums> countries = requestDTO.getCountries();
+//        for (CountryEnums country : countries) {
+//            urlBuilder.append("countries.name=").append(URLEncoder.encode(country.toString().replaceAll("_"," "), StandardCharsets.UTF_8)).append("&");
+//        }
+//
+//        urlBuilder.deleteCharAt(urlBuilder.length() - 1);
+//
+//        log.info(">>>>>>>>URL BUILDER: " + urlBuilder);
+//
+//        return urlBuilder.toString();
+//    }
 
-        urlBuilder.append("movieLength=").append(URLEncoder.encode(requestDTO.getMovieLength(), StandardCharsets.UTF_8)).append("&");
-
-        List<GenreEnums> genres = requestDTO.getGenres();
-        for (GenreEnums genre : genres) {
-            urlBuilder.append("genres.name=").append(URLEncoder.encode(genre.toString().replaceAll("_"," "), StandardCharsets.UTF_8)).append("&");
-        }
-
-        List<CountryEnums> countries = requestDTO.getCountries();
-        for (CountryEnums country : countries) {
-            urlBuilder.append("countries.name=").append(URLEncoder.encode(country.toString().replaceAll("_"," "), StandardCharsets.UTF_8)).append("&");
-        }
-
-        urlBuilder.deleteCharAt(urlBuilder.length() - 1);
-
-        log.info(">>>>>>>>URL BUILDER: " + urlBuilder);
-
-        return urlBuilder.toString();
-    }
 }

@@ -36,9 +36,9 @@ public class Movies {
     private Integer duration;
     @Column(name = "type")
     private String type;
-    @Column(name = "name")
+    @Column(name = "name", length = 1000)
     private String name;
-    @Column(name = "description")
+    @Column(name = "description" , length = 1000)
     private String description;
     @Column(name = "year")
     private int year;
@@ -50,9 +50,9 @@ public class Movies {
     @Column(name = "logo_url")
     private String logoURL;
 
-    @Column(name = "genres")
+    @Column(name = "genres", length = 1000)
     private String genres;
-    @Column(name = "countries")
+    @Column(name = "countries" , length = 1000)
     private String countries;
 
 

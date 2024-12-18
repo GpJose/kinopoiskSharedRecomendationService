@@ -10,10 +10,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class UserProfileDTO {
+public class UsersDTO {
 
     private String login;
     private String email;
-    private List<FriendProfileDTO> friends;
+    private List<FriendsDTO> friends;
     private List<MovieHistoryDTO> movieHistories;
 }

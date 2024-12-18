@@ -9,20 +9,16 @@ import org.springframework.stereotype.Service;
 import ru.kinoposisk.dto.auth.AuthSignUpDTO;
 import ru.kinoposisk.dto.changePass.ChangePassByEmailDTO;
 import ru.kinoposisk.dto.changePass.ChangePassByLoginDTO;
-import ru.kinoposisk.dto.profile.FriendProfileDTO;
+import ru.kinoposisk.dto.profile.FriendsDTO;
 import ru.kinoposisk.dto.profile.MovieHistoryDTO;
-import ru.kinoposisk.dto.profile.UserProfileDTO;
+import ru.kinoposisk.dto.profile.UsersDTO;
 import ru.kinoposisk.model.Users;
-import ru.kinoposisk.model.enums.RoleEnums;
 import ru.kinoposisk.repository.UsersRepository;
 import ru.kinoposisk.service.interfaces.UsersService;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static ru.kinoposisk.model.enums.RoleEnums.*;
 
 @Service
 @Log4j2
@@ -52,11 +48,6 @@ public class UsersServiceImpl implements UsersService {
 
         if (isLoginAndEmailUnique(users.getLogin(), users.getEmail())) {
 
-            if(users.getLogin().equals("Admin")){
-                log.info(">>Is Admin");
-                users.setRoles(List.of(new RoleEnums[]{ROLE_USER, ROLE_ADMIN}));
-                log.info(">>Admin roles: " + users.getRoles());
-            }
             log.info("User with login:{} and email:{} has benn created successfully", users.getLogin(), users.getEmail());
             return usersRepository.save(users);
         }
@@ -118,7 +109,7 @@ public class UsersServiceImpl implements UsersService {
     @Override
     public Users findByLogin(String login) {
 
-        return usersRepository.findByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return usersRepository.findUserByLogin(login).orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
     @Override
     public Users findByEmail(String email) {
@@ -178,7 +169,7 @@ public class UsersServiceImpl implements UsersService {
 
     private boolean isLoginUnique(String login) {
 
-        return !usersRepository.findByLogin(login).isPresent();
+        return !usersRepository.findUserByLogin(login).isPresent();
     }
 
     private boolean isLoginAndEmailUnique(String login, String email) {
@@ -187,20 +178,20 @@ public class UsersServiceImpl implements UsersService {
     }
 
     @Override
-    public UserProfileDTO getProfile(Users user) {
+    public UsersDTO getProfile(Users user) {
 
-        UserProfileDTO userProfileDTO = new UserProfileDTO();
-        userProfileDTO.setLogin(user.getLogin());
-        userProfileDTO.setEmail(user.getEmail());
+        UsersDTO usersDTO = new UsersDTO();
+        usersDTO.setLogin(user.getLogin());
+        usersDTO.setEmail(user.getEmail());
 
-        List<FriendProfileDTO> friends = user.getFriends().stream().map(friendMap -> {
-            FriendProfileDTO friendDTO = new FriendProfileDTO();
+        List<FriendsDTO> friends = user.getFriends().stream().map(friendMap -> {
+            FriendsDTO friendDTO = new FriendsDTO();
             friendDTO.setFriendLogin(friendMap.getFriendId().getLogin());
 
             return friendDTO;
 
         }).collect(Collectors.toList());
-        userProfileDTO.setFriends(friends);
+        usersDTO.setFriends(friends);
 
         List<MovieHistoryDTO> movieHistories = user.getMovieHistoriesList()
                 .stream()
@@ -215,8 +206,8 @@ public class UsersServiceImpl implements UsersService {
                     return movieHistoryDTO;
 
                 }).collect(Collectors.toList());
-        userProfileDTO.setMovieHistories(movieHistories);
+        usersDTO.setMovieHistories(movieHistories);
 
-        return userProfileDTO;
+        return usersDTO;
     }
 }

@@ -3,7 +3,7 @@ package ru.kinoposisk.service.interfaces;
 import ru.kinoposisk.dto.auth.AuthSignUpDTO;
 import ru.kinoposisk.dto.changePass.ChangePassByEmailDTO;
 import ru.kinoposisk.dto.changePass.ChangePassByLoginDTO;
-import ru.kinoposisk.dto.profile.UserProfileDTO;
+import ru.kinoposisk.dto.profile.UsersDTO;
 import ru.kinoposisk.model.Users;
 
 import java.io.IOException;
@@ -23,5 +23,5 @@ public interface UsersService extends BaseService<Users> {
 
     boolean changeActiveStatus(String login, Boolean isActive);
 
-    UserProfileDTO getProfile(Users user);
+    UsersDTO getProfile(Users user);
 }

@@ -10,8 +10,8 @@
 <body>
 <div class="container">
     <h1>Quiz</h1>
-    <%--@elvariable id="quizDTO" type="ru.kinoposisk.dto.quiz.QuizDTO"--%>
-    <form:form modelAttribute="quizDTO" method="post" action="/quiz">
+    <%--@elvariable id="quizAnswersDTO" type="ru.kinoposisk.dto.quiz.QuizAnswersDTO"--%>
+    <form:form modelAttribute="quizAnswersDTO" method="post" action="/quiz">
         <div class="form-group">
             <form:label path="genre">Genre:</form:label>
             <form:select path="genre" multiple="true" class="form-control genre-select">
